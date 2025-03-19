@@ -1,5 +1,6 @@
 package com.example.marketplace.controllers;
 
+import com.example.marketplace.dto.LoginRequest;
 import com.example.marketplace.model.User;
 import com.example.marketplace.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,20 +20,19 @@ public class AuthController {
     private final UserService userService;
     private final HttpServletResponse httpServletResponse;
 
-    @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestParam String username,
-                                         @RequestParam String email,
-                                         @RequestParam String password) {
-        return  ResponseEntity.ok(userService.registerUser(username, email, password));
 
-    };
+    @PostMapping("/register")
+    public ResponseEntity<User> register(@RequestBody User user) {
+        return ResponseEntity.ok(userService.registerUser(user.getUsername(), user.getEmail(), user.getPassword()));
+    }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestParam String email,
-                                                     @RequestParam String password) {
-        String token = userService.login(email, password);
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest loginRequest) {
+        String token = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
+
         Map<String, String> response = new HashMap<>();
         response.put("token", token);
+
         return ResponseEntity.ok(response);
     }
 }
