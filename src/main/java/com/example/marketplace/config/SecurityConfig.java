@@ -39,28 +39,46 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-     return http
-             .cors(cors -> cors.configurationSource(request -> {
-                 logger.info("CORS configuration applied for request: {}", request.getHeader("Origin"));
-                 CorsConfiguration config = new CorsConfiguration();
-                 config.setAllowedOrigins(List.of("http://localhost:9090"));
-                 config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                 config.setAllowedHeaders(List.of("*"));
-                 config.setAllowCredentials(true);
-                 return config;
-             }))
-                .csrf(AbstractHttpConfigurer:: disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new JWTAuthenticationFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//     return http
+//             .cors(cors -> cors.configurationSource(request -> {
+//                 logger.info("CORS configuration applied for request: {}", request.getHeader("Origin"));
+//                 CorsConfiguration config = new CorsConfiguration();
+//                 config.setAllowedOrigins(List.of("http://localhost:9090"));
+//                 config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+//                 config.setAllowedHeaders(List.of("*"));
+//                 config.setAllowCredentials(true);
+//                 return config;
+//             }))
+//                .csrf(AbstractHttpConfigurer:: disable)
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .addFilterBefore(new JWTAuthenticationFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
+//                .build();
+//    }
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                    .loginProcessingUrl("/api/auth/login")
+                    .successHandler((request, response, auth) -> {
+                        String token = jwtUtil.generateToken(auth.getName());
+                        response.getWriter().write("{\"token\":\"" + token + "\"}");
+                        response.setContentType("application/json");
+                    })
+            );
 
+    return http.build();
+}
     @Bean
     public AuthenticationManager authenticationManager(UserDetailsService userDetailsService) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
