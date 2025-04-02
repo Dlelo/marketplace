@@ -38,28 +38,6 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//     return http
-//             .cors(cors -> cors.configurationSource(request -> {
-//                 logger.info("CORS configuration applied for request: {}", request.getHeader("Origin"));
-//                 CorsConfiguration config = new CorsConfiguration();
-//                 config.setAllowedOrigins(List.of("http://localhost:9090"));
-//                 config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-//                 config.setAllowedHeaders(List.of("*"));
-//                 config.setAllowCredentials(true);
-//                 return config;
-//             }))
-//                .csrf(AbstractHttpConfigurer:: disable)
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .addFilterBefore(new JWTAuthenticationFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
-//                .build();
-//    }
 @Bean
 public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
