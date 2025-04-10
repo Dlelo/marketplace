@@ -18,7 +18,7 @@ public class Product {
     private Long id;
     private String name;
     private BigDecimal price;
-    private String Category;
+    private String category;
     private String description;
 
     @ManyToOne
