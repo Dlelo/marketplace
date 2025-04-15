@@ -3,6 +3,7 @@ package com.example.marketplace.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -19,8 +20,12 @@ public class User {
     private String email;
     private String password;
 
-    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
-
-    private Set<Role> roles;
+   @ManyToMany(fetch = FetchType.EAGER)
+   @JoinTable(
+           name="user_roles",
+           joinColumns = @JoinColumn(name="user_id"),
+           inverseJoinColumns = @JoinColumn(name="role_id")
+   )
+   @Builder.Default
+    private Set<Role> roles = new HashSet<>();
 }
