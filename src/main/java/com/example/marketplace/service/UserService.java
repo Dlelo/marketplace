@@ -52,7 +52,6 @@ public class UserService {
 
         User user = userOptional.get();
 
-        // 🚨 TEMPORARY: Skipping password verification
         if (!password.equals(user.getPassword())) {
             throw new RuntimeException("Invalid password");
         }
