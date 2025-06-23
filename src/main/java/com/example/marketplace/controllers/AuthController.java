@@ -1,6 +1,8 @@
 package com.example.marketplace.controllers;
 
+import com.example.marketplace.dto.BuyerRegisterRequest;
 import com.example.marketplace.dto.LoginRequest;
+import com.example.marketplace.dto.SellerRegisterRequest;
 import com.example.marketplace.model.User;
 import com.example.marketplace.security.JWTUtil;
 import com.example.marketplace.service.UserService;
@@ -25,9 +27,14 @@ public class AuthController {
     private final JWTUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
 
-    @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        return ResponseEntity.ok(userService.registerUser(user.getUsername(), user.getEmail(), user.getPassword()));
+    @PostMapping("/register/buyer")
+    public ResponseEntity<User> registerBuyer(@RequestBody BuyerRegisterRequest dto) {
+        return ResponseEntity.ok(userService.registerBuyer(dto));
+    }
+
+    @PostMapping("/register/seller")
+    public ResponseEntity<User> registerSeller(@RequestBody SellerRegisterRequest dto) {
+        return ResponseEntity.ok(userService.registerSeller(dto));
     }
 
     @PostMapping("/login")
