@@ -10,5 +10,5 @@ public class BuyerRegisterRequest {
     private String location;
     private String preferences;
     private int numberOfChildren;
-    private int houseSize;
+    private String houseSize;
 }
