@@ -53,11 +53,16 @@ public class AuthController {
                     )
             );
 
+            System.out.println("AUTHENTICATION SUCCESS: " + authentication.getName());
+
             String token = jwtUtil.generateToken(authentication.getName());
+            System.out.println("JWT GENERATED: " + token);
             return ResponseEntity.ok(Collections.singletonMap("token", token));
         } catch (BadCredentialsException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
         }
     }

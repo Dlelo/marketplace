@@ -46,14 +46,17 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
                     .requestMatchers("/api/auth/**").permitAll()
                     .anyRequest().authenticated()
             )
-            .formLogin(form -> form
-                    .loginProcessingUrl("/api/auth/login")
-                    .successHandler((request, response, auth) -> {
-                        String token = jwtUtil.generateToken(auth.getName());
-                        response.getWriter().write("{\"token\":\"" + token + "\"}");
-                        response.setContentType("application/json");
-                    })
-            );
+//            .formLogin(form -> form
+//                    .loginProcessingUrl("/api/auth/login")
+//                    .successHandler((request, response, auth) -> {
+//                        String token = jwtUtil.generateToken(auth.getName());
+//                        response.getWriter().write("{\"token\":\"" + token + "\"}");
+//                        response.setContentType("application/json");
+//                    })
+//            );
+
+            .formLogin(AbstractHttpConfigurer::disable);
+
 
     return http.build();
 }
