@@ -3,7 +3,7 @@ package com.example.marketplace.dto;
 import lombok.Data;
 
 @Data
-public class BuyerRegisterRequest {
+public class HomeOwnerRegisterRequest {
     private String username;
     private String email;
     private String password;

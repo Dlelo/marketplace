@@ -1,7 +1,7 @@
 package com.example.marketplace.service;
 
-import com.example.marketplace.dto.BuyerRegisterRequest;
-import com.example.marketplace.dto.SellerRegisterRequest;
+import com.example.marketplace.dto.HomeOwnerRegisterRequest;
+import com.example.marketplace.dto.HouseHelpRegisterRequest;
 import com.example.marketplace.model.Role;
 import com.example.marketplace.model.User;
 import com.example.marketplace.repository.RoleRepository;
@@ -10,7 +10,6 @@ import com.example.marketplace.security.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +20,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JWTUtil jwtUtil;
 
-    public User registerBuyer(BuyerRegisterRequest request) {
-        Role buyerRole = getRoleByName("BUYER");
+    public User registerHomeOwner(HomeOwnerRegisterRequest request) {
+        Role buyerRole = getRoleByName("HOMEOWNER");
 
         User user = User.builder()
                 .username(request.getUsername())
@@ -41,8 +38,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User registerSeller(SellerRegisterRequest request) {
-        Role sellerRole = getRoleByName("SELLER");
+    public User registerHouseHelp(HouseHelpRegisterRequest request) {
+        Role sellerRole = getRoleByName("HOUSEHELP");
 
         User user = User.builder()
                 .username(request.getUsername())
@@ -63,7 +60,6 @@ public class UserService {
 
         User user = userOptional.get();
 
-        // Use encoder to match hashed password
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Invalid password");
         }

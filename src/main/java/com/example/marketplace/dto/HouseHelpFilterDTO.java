@@ -3,8 +3,6 @@ package com.example.marketplace.dto;
 import com.example.marketplace.enums.AvailabilityType;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class HouseHelpFilterDTO {
 

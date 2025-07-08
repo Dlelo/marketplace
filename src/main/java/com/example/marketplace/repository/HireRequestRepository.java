@@ -1,6 +1,7 @@
 package com.example.marketplace.repository;
 
 import com.example.marketplace.dto.HireRequest;
+import com.example.marketplace.dto.HouseHelpFilterDTO;
 import com.example.marketplace.model.HouseHelp;
 import org.springframework.data.jpa.repository.JpaRepository;
 

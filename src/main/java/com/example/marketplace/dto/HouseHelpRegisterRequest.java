@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class SellerRegisterRequest {
+public class HouseHelpRegisterRequest {
     private String username;
     private String email;
     private String password;

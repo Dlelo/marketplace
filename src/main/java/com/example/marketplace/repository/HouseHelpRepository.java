@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface HouseHelpRepository extends JpaRepository<HouseHelp, Long>, HireRequestRepository.HouseHelpCustomRepository {
+public interface HouseHelpRepository extends JpaRepository<HouseHelp, Long>, HouseHelpCustomRepository {
 
     /**
      * Find a house help by the associated User entity.
@@ -20,8 +20,5 @@ public interface HouseHelpRepository extends JpaRepository<HouseHelp, Long>, Hir
      */
     Optional<HouseHelp> findByUser_Email(String email);
 
-    /**
-     * Example derived query: get all verified house helps
-     */
-    // List<HouseHelp> findByVerifiedTrue(); // Uncomment if needed
+    // Optional: List<HouseHelp> findByVerifiedTrue();
 }

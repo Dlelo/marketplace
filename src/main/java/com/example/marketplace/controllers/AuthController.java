@@ -1,8 +1,8 @@
 package com.example.marketplace.controllers;
 
-import com.example.marketplace.dto.BuyerRegisterRequest;
+import com.example.marketplace.dto.HomeOwnerRegisterRequest;
+import com.example.marketplace.dto.HouseHelpRegisterRequest;
 import com.example.marketplace.dto.LoginRequest;
-import com.example.marketplace.dto.SellerRegisterRequest;
 import com.example.marketplace.model.User;
 import com.example.marketplace.security.JWTUtil;
 import com.example.marketplace.service.UserService;
@@ -13,12 +13,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -28,14 +24,14 @@ public class AuthController {
     private final JWTUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
 
-    @PostMapping("/register/buyer")
-    public ResponseEntity<User> registerBuyer(@RequestBody BuyerRegisterRequest dto) {
-        return ResponseEntity.ok(userService.registerBuyer(dto));
+    @PostMapping("/register/homeowner")
+    public ResponseEntity<User> registerHomeOwner(@RequestBody HomeOwnerRegisterRequest dto) {
+        return ResponseEntity.ok(userService.registerHomeOwner(dto));
     }
 
-    @PostMapping("/register/seller")
-    public ResponseEntity<User> registerSeller(@RequestBody SellerRegisterRequest dto) {
-        return ResponseEntity.ok(userService.registerSeller(dto));
+    @PostMapping("/register/househelp")
+    public ResponseEntity<User> registerSeller(@RequestBody HouseHelpRegisterRequest dto) {
+        return ResponseEntity.ok(userService.registerHouseHelp(dto));
     }
 
     @PostMapping("/login")
