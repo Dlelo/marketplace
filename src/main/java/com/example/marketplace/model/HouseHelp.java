@@ -1,16 +1,21 @@
 package com.example.marketplace.model;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
 public class HouseHelp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @OneToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
     private String bio;
@@ -20,6 +25,8 @@ public class HouseHelp {
     private String languages;
     private String photoUrl;
     private String videoUrl;
+
+    @ElementCollection
     private List<String> skills;
 
     // other fields and relationships (e.g., reviews)

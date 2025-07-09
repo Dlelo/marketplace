@@ -1,12 +1,16 @@
 package com.example.marketplace.model;
 import com.example.marketplace.enums.RequestStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
 public class HireRequest {
 
     @Id
@@ -14,10 +18,10 @@ public class HireRequest {
     private Long id;
 
     @ManyToOne
-    private User buyer;
+    private User homeOwner;
 
     @ManyToOne
-    private User seller;
+    private User houseHelp;
 
     @Enumerated(EnumType.STRING)
     private RequestStatus status;

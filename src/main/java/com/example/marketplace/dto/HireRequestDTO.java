@@ -5,8 +5,8 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class HireRequest {
-   private Long SellerId;
+public class HireRequestDTO {
+   private Long HouseHelpId;
    private LocalDate startDate;
    private String message;
     }

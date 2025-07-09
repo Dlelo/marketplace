@@ -1,7 +1,16 @@
+package com.example.marketplace.service;
+
+import com.example.marketplace.dto.HireRequestDTO;
+import com.example.marketplace.enums.RequestStatus;
 import com.example.marketplace.model.HireRequest;
+import com.example.marketplace.model.HouseHelp;
+import com.example.marketplace.model.User;
 import com.example.marketplace.repository.HireRequestRepository;
+import com.example.marketplace.repository.HouseHelpRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -10,13 +19,13 @@ public class HireRequestService {
     private final HireRequestRepository hireRequestRepository;
     private final HouseHelpRepository houseHelpRepository;
 
-    public HireRequest createHireRequest(HireRequest dto, User buyer) {
+    public HireRequest createHireRequest(HireRequestDTO dto, User homeOwner) {
         HouseHelp houseHelp = houseHelpRepository.findById(dto.getHouseHelpId())
                 .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
 
         HireRequest request = new HireRequest();
-        request.setBuyer(buyer);
-        request.setHouseHelp(houseHelp);
+        request.setHomeOwner(homeOwner);
+        request.setHouseHelp(houseHelp.getUser());
         request.setStatus(RequestStatus.PENDING);
         request.setStartDate(dto.getStartDate());
         request.setMessage(dto.getMessage());
@@ -31,6 +40,6 @@ public class HireRequestService {
     }
 
     public List<HireRequest> getRequestsForHouseHelp(Long houseHelpId) {
-        return hireRequestRepository.findByHouseHelpId(houseHelpId);
+        return hireRequestRepository.findByHouseHelp_Id(houseHelpId);
     }
 }
