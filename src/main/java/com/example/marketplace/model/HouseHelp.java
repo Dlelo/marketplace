@@ -1,4 +1,5 @@
 package com.example.marketplace.model;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +10,6 @@ import java.util.List;
 @Getter
 @Setter
 public class HouseHelp {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,9 +25,8 @@ public class HouseHelp {
     private String languages;
     private String photoUrl;
     private String videoUrl;
+    private String availability; // Added to store availability type
 
     @ElementCollection
     private List<String> skills;
-
-    // other fields and relationships (e.g., reviews)
 }

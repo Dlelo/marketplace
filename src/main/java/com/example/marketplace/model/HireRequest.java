@@ -18,7 +18,7 @@ public class HireRequest {
     private Long id;
 
     @ManyToOne
-    private User homeOwner;
+    private User houseOwner;
 
     @ManyToOne
     private User houseHelp;
