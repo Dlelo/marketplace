@@ -1,5 +1,6 @@
 package com.example.marketplace.model;
 
+import com.example.marketplace.enums.InterviewStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,5 +24,5 @@ public class Interview {
     @Enumerated(EnumType.STRING)
     private InterviewStatus status;
 
-    private String meetingDetails; // e.g., Zoom link or location
+    private String meetingDetails;
 }
