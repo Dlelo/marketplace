@@ -1,6 +1,7 @@
 package com.example.marketplace.config;
 import com.example.marketplace.security.JWTAuthenticationFilter;
 import com.example.marketplace.security.JWTUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.ProviderManager;
@@ -44,14 +45,24 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/roles/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/roles/**").permitAll()
                         .requestMatchers("/api/househelp/**").authenticated()
                         .requestMatchers("/api/hire-requests/**").authenticated()
                         .requestMatchers("/api/interviews/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JWTAuthenticationFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            logger.error("Authentication error for URI {}: {}", request.getRequestURI(), authException.getMessage());
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed: " + authException.getMessage());
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            logger.error("Access denied for URI {}: {}", request.getRequestURI(), accessDeniedException.getMessage());
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied: " + accessDeniedException.getMessage());
+                        })
+                )
                 .formLogin(AbstractHttpConfigurer::disable);
         return http.build();
     }

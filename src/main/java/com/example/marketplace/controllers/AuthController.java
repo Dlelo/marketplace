@@ -30,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/register/househelp")
-    public ResponseEntity<User> registerSeller(@RequestBody HouseHelpRegisterRequest dto) {
+    public ResponseEntity<User> registerHouseHelp(@RequestBody HouseHelpRegisterRequest dto) {
         return ResponseEntity.ok(userService.registerHouseHelp(dto));
     }
 
