@@ -15,4 +15,7 @@ public class HouseHelpRegisterRequest {
     private String numberOfChildren;
     private List<String> types;
     private String availability;
+    private String bio;
+    private Double expectedSalary;
+    private String photoUrl;
 }

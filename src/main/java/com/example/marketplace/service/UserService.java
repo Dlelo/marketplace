@@ -10,8 +10,6 @@ import com.example.marketplace.repository.RoleRepository;
 import com.example.marketplace.repository.UserRepository;
 import com.example.marketplace.security.JWTUtil;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -55,6 +53,11 @@ public class UserService {
         houseHelp.setSkills(request.getSkills());
         houseHelp.setLanguages(String.join(",", request.getTypes()));
         houseHelp.setAvailability(request.getAvailability());
+        houseHelp.setNumberOfChildren(request.getNumberOfChildren());
+        houseHelp.setIdNumber(request.getIdNumber());
+        houseHelp.setBio(request.getBio() != null ? request.getBio() : "");
+        houseHelp.setExpectedSalary(request.getExpectedSalary() != null ? request.getExpectedSalary() : 0.0);
+        houseHelp.setPhotoUrl(request.getPhotoUrl() != null ? request.getPhotoUrl() : "");
         houseHelpRepository.save(houseHelp);
 
         return user;

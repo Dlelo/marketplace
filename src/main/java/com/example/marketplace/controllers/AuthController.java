@@ -25,13 +25,29 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register/homeowner")
-    public ResponseEntity<User> registerHomeOwner(@RequestBody HomeOwnerRegisterRequest dto) {
-        return ResponseEntity.ok(userService.registerHomeOwner(dto));
+    public ResponseEntity<?> registerHomeOwner(@RequestBody HomeOwnerRegisterRequest dto) {
+        try {
+            return ResponseEntity.ok(userService.registerHomeOwner(dto));
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Registration failed: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Registration error: " + e.getMessage());
+        }
     }
 
     @PostMapping("/register/househelp")
-    public ResponseEntity<User> registerHouseHelp(@RequestBody HouseHelpRegisterRequest dto) {
-        return ResponseEntity.ok(userService.registerHouseHelp(dto));
+    public ResponseEntity<?> registerHouseHelp(@RequestBody HouseHelpRegisterRequest dto) {
+        try {
+            return ResponseEntity.ok(userService.registerHouseHelp(dto));
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Registration failed: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Registration error: " + e.getMessage());
+        }
     }
 
     @PostMapping("/login")

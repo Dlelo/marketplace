@@ -25,8 +25,10 @@ public class HouseHelp {
     private String languages;
     private String photoUrl;
     private String videoUrl;
-    private String availability; // Added to store availability type
+    private String availability;
 
     @ElementCollection
     private List<String> skills;
+    private String numberOfChildren;
+    private String idNumber;
 }
