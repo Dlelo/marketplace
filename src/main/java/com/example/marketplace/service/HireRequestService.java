@@ -20,8 +20,16 @@ public class HireRequestService {
     private final HouseHelpRepository houseHelpRepository;
     private final UserRepository userRepository;
 
-    public HireRequest createHireRequest(HireRequestDTO dto, User houseOwner) {
-        HouseHelp houseHelp = houseHelpRepository.findById(dto.getHouseHelpId())
+
+    public HireRequest createHireRequest(HireRequestDTO hireRequestDTO, User houseOwner) {
+        if (hireRequestDTO.getHouseHelpId() == null) {
+            throw new IllegalArgumentException("HouseHelpId cannot be null");
+        }
+
+        if (hireRequestDTO.getStartDate() == null) {
+            throw new IllegalArgumentException("StartDate cannot be null");
+        }
+        HouseHelp houseHelp = houseHelpRepository.findById(hireRequestDTO.getHouseHelpId())
                 .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
         if (!houseHelp.getVerified()) {
             throw new RuntimeException("HouseHelp is not verified");
@@ -30,8 +38,8 @@ public class HireRequestService {
         request.setHouseOwner(houseOwner);
         request.setHouseHelp(houseHelp.getUser());
         request.setStatus(RequestStatus.PENDING);
-        request.setStartDate(dto.getStartDate());
-        request.setMessage(dto.getMessage());
+        request.setStartDate(hireRequestDTO.getStartDate());
+        request.setMessage(hireRequestDTO.getMessage());
         return hireRequestRepository.save(request);
     }
 
