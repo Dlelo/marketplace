@@ -1,20 +1,18 @@
 package com.example.marketplace.service;
 
-import com.example.marketplace.dto.HomeOwnerRegisterRequest;
-import com.example.marketplace.dto.HouseHelpRegisterRequest;
+import com.example.marketplace.dto.RegisterRequest;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.model.Role;
 import com.example.marketplace.model.User;
 import com.example.marketplace.repository.HouseHelpRepository;
 import com.example.marketplace.repository.RoleRepository;
 import com.example.marketplace.repository.UserRepository;
-import com.example.marketplace.security.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.Optional;
+import java.util.HashSet;
 
 @Service
 @RequiredArgsConstructor
@@ -23,60 +21,39 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final HouseHelpRepository houseHelpRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JWTUtil jwtUtil;
 
-    public User registerHomeOwner(HomeOwnerRegisterRequest request) {
-        Role buyerRole = getRoleByName("HOMEOWNER");
-        User user = User.builder()
-                .username(request.getUsername())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .roles(Collections.singleton(buyerRole))
-                .build();
-        return userRepository.save(user);
-    }
-
-    public User registerHouseHelp(HouseHelpRegisterRequest request) {
-        Role sellerRole = getRoleByName("HOUSEHELP");
-        User user = User.builder()
-                .username(request.getUsername())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .roles(Collections.singleton(sellerRole))
-                .build();
-        user = userRepository.save(user);
-
-        HouseHelp houseHelp = new HouseHelp();
-        houseHelp.setUser(user);
-        houseHelp.setVerified(false);
-        houseHelp.setExperienceYears(request.getExperienceYears());
-        houseHelp.setSkills(request.getSkills());
-        houseHelp.setLanguages(String.join(",", request.getTypes()));
-        houseHelp.setAvailability(request.getAvailability());
-        houseHelp.setNumberOfChildren(request.getNumberOfChildren());
-        houseHelp.setIdNumber(request.getIdNumber());
-        houseHelp.setBio(request.getBio() != null ? request.getBio() : "");
-        houseHelp.setExpectedSalary(request.getExpectedSalary() != null ? request.getExpectedSalary() : 0.0);
-        houseHelp.setPhotoUrl(request.getPhotoUrl() != null ? request.getPhotoUrl() : "");
-        houseHelpRepository.save(houseHelp);
-
-        return user;
-    }
-
-    public String login(String email, String password) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isEmpty()) {
-            throw new RuntimeException("User not found");
+    public User registerUser(RegisterRequest dto, String roleName) {
+        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already exists");
         }
-        User user = userOptional.get();
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+        if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("Username already exists");
         }
-        return jwtUtil.generateToken(user.getEmail());
+
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new IllegalArgumentException("Role " + roleName + " does not exist. Please create it first."));
+
+        User user = new User();
+        user.setEmail(dto.getEmail());
+        user.setUsername(dto.getUsername());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setName(dto.getName());
+        user.setRoles(new HashSet<>(Collections.singletonList(role)));
+        User savedUser = userRepository.save(user);
+
+        if (roleName.equals("HOUSEHELP")) {
+            HouseHelp houseHelp = new HouseHelp();
+            houseHelp.setUser(savedUser);
+            houseHelp.setVerified(false);
+            houseHelpRepository.save(houseHelp);
+        }
+
+        return savedUser;
     }
 
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     public HouseHelp verifyHouseHelp(Long houseHelpId) {
@@ -84,10 +61,5 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
         houseHelp.setVerified(true);
         return houseHelpRepository.save(houseHelp);
-    }
-
-    private Role getRoleByName(String roleName) {
-        return roleRepository.findByName(roleName)
-                .orElseThrow(() -> new IllegalArgumentException(roleName + " role does not exist. Please create it first."));
     }
 }

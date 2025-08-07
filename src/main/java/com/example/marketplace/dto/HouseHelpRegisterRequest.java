@@ -9,6 +9,7 @@ public class HouseHelpRegisterRequest {
     private String username;
     private String email;
     private String password;
+    private String name;
     private int experienceYears;
     private List<String> skills;
     private String idNumber;

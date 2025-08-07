@@ -9,7 +9,11 @@ import com.example.marketplace.repository.HireRequestRepository;
 import com.example.marketplace.repository.HouseHelpRepository;
 import com.example.marketplace.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
@@ -41,6 +45,19 @@ public class HireRequestService {
         request.setStartDate(hireRequestDTO.getStartDate());
         request.setMessage(hireRequestDTO.getMessage());
         return hireRequestRepository.save(request);
+    }
+
+    @PostMapping("/househelp/{houseHelpId}/verify")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> verifyHouseHelp(@PathVariable Long houseHelpId) {
+        HouseHelp houseHelp = houseHelpRepository.findById(houseHelpId)
+                .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
+        if (houseHelp.getVerified()) {
+            return ResponseEntity.ok("HouseHelp is already verified");
+        }
+        houseHelp.setVerified(true);
+        houseHelpRepository.save(houseHelp);
+        return ResponseEntity.ok("HouseHelp verified successfully");
     }
 
     public void updateStatus(Long requestId, RequestStatus status) {
