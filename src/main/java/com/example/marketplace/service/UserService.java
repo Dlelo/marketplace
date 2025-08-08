@@ -1,6 +1,7 @@
 package com.example.marketplace.service;
 
 import com.example.marketplace.dto.RegisterRequest;
+import com.example.marketplace.dto.UserResponseDTO;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.model.Role;
 import com.example.marketplace.model.User;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +25,7 @@ public class UserService {
     private final HouseHelpRepository houseHelpRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public User registerUser(RegisterRequest dto, String roleName) {
+    public UserResponseDTO registerUser(RegisterRequest dto, String roleName) {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already exists");
         }
@@ -48,7 +51,16 @@ public class UserService {
             houseHelpRepository.save(houseHelp);
         }
 
-        return savedUser;
+        UserResponseDTO response = new UserResponseDTO();
+        response.setId(savedUser.getId());
+        response.setUsername(savedUser.getUsername());
+        response.setEmail(savedUser.getEmail());
+        response.setName(savedUser.getName());
+        response.setRoles(savedUser.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet()));
+
+        return response;
     }
 
     public User findByEmail(String email) {

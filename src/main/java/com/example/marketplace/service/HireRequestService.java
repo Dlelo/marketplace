@@ -1,6 +1,7 @@
 package com.example.marketplace.service;
 
 import com.example.marketplace.dto.HireRequestDTO;
+import com.example.marketplace.dto.HireRequestResponseDTO;
 import com.example.marketplace.enums.RequestStatus;
 import com.example.marketplace.model.HireRequest;
 import com.example.marketplace.model.HouseHelp;
@@ -9,74 +10,74 @@ import com.example.marketplace.repository.HireRequestRepository;
 import com.example.marketplace.repository.HouseHelpRepository;
 import com.example.marketplace.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class HireRequestService {
     private final HireRequestRepository hireRequestRepository;
-    private final HouseHelpRepository houseHelpRepository;
     private final UserRepository userRepository;
+    private final HouseHelpRepository houseHelpRepository;
 
-
-    public HireRequest createHireRequest(HireRequestDTO hireRequestDTO, User houseOwner) {
-        if (hireRequestDTO.getHouseHelpId() == null) {
-            throw new IllegalArgumentException("HouseHelpId cannot be null");
-        }
-
-        if (hireRequestDTO.getStartDate() == null) {
-            throw new IllegalArgumentException("StartDate cannot be null");
-        }
+    public HireRequestResponseDTO createHireRequest(HireRequestDTO hireRequestDTO, User houseOwner) {
         HouseHelp houseHelp = houseHelpRepository.findById(hireRequestDTO.getHouseHelpId())
-                .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
-        if (!houseHelp.getVerified()) {
-            throw new RuntimeException("HouseHelp is not verified");
+                .orElseThrow(() -> new IllegalArgumentException("HouseHelp not found"));
+        if (!houseHelp.isVerified()) {
+            throw new IllegalArgumentException("HouseHelp must be verified before hiring");
         }
-        HireRequest request = new HireRequest();
-        request.setHouseOwner(houseOwner);
-        request.setHouseHelp(houseHelp.getUser());
-        request.setStatus(RequestStatus.PENDING);
-        request.setStartDate(hireRequestDTO.getStartDate());
-        request.setMessage(hireRequestDTO.getMessage());
-        return hireRequestRepository.save(request);
+
+        HireRequest hireRequest = new HireRequest();
+        hireRequest.setHouseOwner(houseOwner);
+        hireRequest.setHouseHelp(houseHelp.getUser());
+        hireRequest.setStatus(RequestStatus.PENDING);
+        HireRequest savedRequest = hireRequestRepository.save(hireRequest);
+
+        HireRequestResponseDTO response = new HireRequestResponseDTO();
+        response.setId(savedRequest.getId());
+        response.setHouseOwnerId(savedRequest.getHouseOwner().getId());
+        response.setHouseHelpId(savedRequest.getHouseHelp().getId());
+        response.setStatus(savedRequest.getStatus());
+        return response;
     }
 
-    @PostMapping("/househelp/{houseHelpId}/verify")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> verifyHouseHelp(@PathVariable Long houseHelpId) {
-        HouseHelp houseHelp = houseHelpRepository.findById(houseHelpId)
-                .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
-        if (houseHelp.getVerified()) {
-            return ResponseEntity.ok("HouseHelp is already verified");
-        }
-        houseHelp.setVerified(true);
-        houseHelpRepository.save(houseHelp);
-        return ResponseEntity.ok("HouseHelp verified successfully");
+    public void updateStatus(Long id, RequestStatus status) {
+        HireRequest hireRequest = hireRequestRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("HireRequest not found"));
+        hireRequest.setStatus(status);
+        hireRequestRepository.save(hireRequest);
     }
 
-    public void updateStatus(Long requestId, RequestStatus status) {
-        HireRequest request = hireRequestRepository.findById(requestId)
-                .orElseThrow(() -> new RuntimeException("Request not found"));
-        request.setStatus(status);
-        hireRequestRepository.save(request);
+    public List<HireRequestResponseDTO> getRequestsForHouseHelp(Long houseHelpId) {
+        return hireRequestRepository.findByHouseHelp_Id(houseHelpId).stream()
+                .map(request -> {
+                    HireRequestResponseDTO dto = new HireRequestResponseDTO();
+                    dto.setId(request.getId());
+                    dto.setHouseOwnerId(request.getHouseOwner().getId());
+                    dto.setHouseHelpId(request.getHouseHelp().getId());
+                    dto.setStatus(request.getStatus());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
-    public List<HireRequest> getRequestsForHouseHelp(Long houseHelpId) {
-        return hireRequestRepository.findByHouseHelp_Id(houseHelpId);
-    }
-
-    public List<HireRequest> findByHouseOwner_Id(Long houseOwnerId) {
-        return hireRequestRepository.findByHouseOwner_Id(houseOwnerId);
+    public List<HireRequestResponseDTO> findByHouseOwner_Id(Long houseOwnerId) {
+        return hireRequestRepository.findByHouseOwner_Id(houseOwnerId).stream()
+                .map(request -> {
+                    HireRequestResponseDTO dto = new HireRequestResponseDTO();
+                    dto.setId(request.getId());
+                    dto.setHouseOwnerId(request.getHouseOwner().getId());
+                    dto.setHouseHelpId(request.getHouseHelp().getId());
+                    dto.setStatus(request.getStatus());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     public User findHouseOwnerByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("HouseOwner not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 }

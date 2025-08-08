@@ -1,5 +1,6 @@
 package com.example.marketplace.controllers;
 
+import com.example.marketplace.dto.RoleResponseDTO;
 import com.example.marketplace.model.Role;
 import com.example.marketplace.service.RoleService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ public class RoleController {
     @PostMapping
     public ResponseEntity<?> createRole(@RequestBody Role role) {
         try {
-            Role savedRole = roleService.createRole(role);
+            RoleResponseDTO savedRole = roleService.createRole(role);
             return ResponseEntity.ok(savedRole);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -29,8 +30,9 @@ public class RoleController {
         roleService.deleteRole(roleId);
         return ResponseEntity.noContent().build();
     }
+
     @GetMapping
-    public ResponseEntity<List<Role>> getAllRoles() {
+    public ResponseEntity<List<RoleResponseDTO>> getAllRoles() {
         return ResponseEntity.ok(roleService.getAllRoles());
     }
 }

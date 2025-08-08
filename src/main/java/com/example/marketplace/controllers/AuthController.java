@@ -2,6 +2,7 @@ package com.example.marketplace.controllers;
 
 import com.example.marketplace.dto.LoginRequest;
 import com.example.marketplace.dto.RegisterRequest;
+import com.example.marketplace.dto.UserResponseDTO;
 import com.example.marketplace.security.JWTUtil;
 import com.example.marketplace.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,8 @@ public class AuthController {
                 }
             }
 
-            return ResponseEntity.ok(userService.registerUser(dto, roleName));
+            UserResponseDTO userResponse = userService.registerUser(dto, roleName);
+            return ResponseEntity.ok(userResponse);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Registration failed: " + e.getMessage());
         } catch (Exception e) {
