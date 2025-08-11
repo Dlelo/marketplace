@@ -42,6 +42,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setName(dto.getName());
         user.setRoles(new HashSet<>(Collections.singletonList(role)));
+        //role.getUsers().add(user);
         User savedUser = userRepository.save(user);
 
         if (roleName.equals("HOUSEHELP")) {

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -21,6 +22,8 @@ public class Role {
     private String description;
 
     @ManyToMany(mappedBy = "roles")
-    @JsonIgnore
-    private Set<User> users;
+    @JsonBackReference
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<User> users = new HashSet<>();
 }
