@@ -2,7 +2,6 @@ package com.example.marketplace.service;
 
 import com.example.marketplace.model.User;
 import com.example.marketplace.repository.UserRepository;
-import com.example.marketplace.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

@@ -1,5 +1,6 @@
 package com.example.marketplace.controllers;
 
+import com.example.marketplace.dto.RoleRequestDTO;
 import com.example.marketplace.dto.RoleResponseDTO;
 import com.example.marketplace.model.Role;
 import com.example.marketplace.service.RoleService;
@@ -16,8 +17,11 @@ public class RoleController {
     private final RoleService roleService;
 
     @PostMapping
-    public ResponseEntity<?> createRole(@RequestBody Role role) {
+    public ResponseEntity<?> createRole(@RequestBody RoleRequestDTO roleDTO) {
         try {
+            Role role = new Role();
+            role.setName(roleDTO.getName());
+            role.setDescription(roleDTO.getDescription());
             RoleResponseDTO savedRole = roleService.createRole(role);
             return ResponseEntity.ok(savedRole);
         } catch (IllegalArgumentException e) {

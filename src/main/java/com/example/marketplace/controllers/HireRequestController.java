@@ -4,7 +4,6 @@ import com.example.marketplace.dto.HireRequestDTO;
 import com.example.marketplace.dto.HireRequestResponseDTO;
 import com.example.marketplace.enums.RequestStatus;
 import com.example.marketplace.model.HouseHelp;
-import com.example.marketplace.model.User;
 import com.example.marketplace.repository.HouseHelpRepository;
 import com.example.marketplace.service.HireRequestService;
 import lombok.RequiredArgsConstructor;

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,7 +41,6 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setName(dto.getName());
         user.setRoles(new HashSet<>(Collections.singletonList(role)));
-        //role.getUsers().add(user);
         User savedUser = userRepository.save(user);
 
         if (roleName.equals("HOUSEHELP")) {
@@ -63,6 +61,30 @@ public class UserService {
 
         return response;
     }
+
+    public UserResponseDTO addRoleToUser(Long userId, String roleName) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Role role = roleRepository.findByName(roleName.toUpperCase())
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        user.getRoles().add(role);
+        User updatedUser = userRepository.save(user);
+
+        // Build response
+        UserResponseDTO response = new UserResponseDTO();
+        response.setId(updatedUser.getId());
+        response.setUsername(updatedUser.getUsername());
+        response.setEmail(updatedUser.getEmail());
+        response.setName(updatedUser.getName());
+        response.setRoles(updatedUser.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet()));
+
+        return response;
+    }
+
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)

@@ -15,6 +15,7 @@ import java.util.List;
 
 @Repository
 public class HouseHelpCustomRepositoryImpl implements HouseHelpCustomRepository {
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -25,21 +26,27 @@ public class HouseHelpCustomRepositoryImpl implements HouseHelpCustomRepository 
         Root<HouseHelp> root = query.from(HouseHelp.class);
         List<Predicate> predicates = new ArrayList<>();
 
-        predicates.add(cb.equal(root.get("verified"), true)); // Only verified househelps
+        predicates.add(cb.isTrue(root.get("verified")));
 
-        if (filter.getMinExperience() != null) {
-            predicates.add(cb.ge(root.get("experienceYears"), filter.getMinExperience()));
+        if (filter.getExperience() != null) {
+            predicates.add(cb.ge(root.get("experienceYears"), filter.getExperience()));
         }
+
         if (filter.getAvailability() != null) {
-            predicates.add(cb.equal(root.get("availability"), filter.getAvailability().toString()));
+            predicates.add(cb.equal(root.get("availability"), filter.getAvailability()));
         }
-        if (filter.getMinSalary() != null) {
-            predicates.add(cb.ge(root.get("expectedSalary"), filter.getMinSalary()));
+        if (filter.getMinExpectedSalary() != null) {
+            predicates.add(cb.ge(root.get("expectedSalary"), filter.getMinExpectedSalary()));
         }
-        if (filter.getMaxSalary() != null) {
-            predicates.add(cb.le(root.get("expectedSalary"), filter.getMaxSalary()));
+        if (filter.getMaxExpectedSalary() != null) {
+            predicates.add(cb.le(root.get("expectedSalary"), filter.getMaxExpectedSalary()));
         }
-
+        if (filter.getLanguages() != null) {
+            predicates.add(cb.like(cb.lower(root.get("languages")), "%" + filter.getLanguages().toLowerCase() + "%"));
+        }
+        if (filter.getNumberOfChildren() != null) {
+            predicates.add(cb.ge(root.get("numberOfChildren"), filter.getNumberOfChildren()));
+        }
         query.where(predicates.toArray(new Predicate[0]));
         return entityManager.createQuery(query).getResultList();
     }
