@@ -72,7 +72,6 @@ public class UserService {
         user.getRoles().add(role);
         User updatedUser = userRepository.save(user);
 
-        // Build response
         UserResponseDTO response = new UserResponseDTO();
         response.setId(updatedUser.getId());
         response.setUsername(updatedUser.getUsername());

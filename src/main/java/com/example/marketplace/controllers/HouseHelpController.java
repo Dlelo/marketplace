@@ -17,7 +17,7 @@ public class HouseHelpController {
     private final HouseHelpService houseHelpService;
 
     @PutMapping("/verify/{id}")
-    @PreAuthorize("hasRole('ADMIN')") // Assuming an admin role for verification
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HouseHelp> verifyHouseHelp(@PathVariable Long id) {
         return ResponseEntity.ok(houseHelpService.verifyHouseHelp(id));
     }
