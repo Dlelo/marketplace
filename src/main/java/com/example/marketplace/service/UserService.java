@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,6 +61,24 @@ public class UserService {
                 .collect(Collectors.toSet()));
 
         return response;
+    }
+
+    public List<UserResponseDTO> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(user -> {
+                    UserResponseDTO dto = new UserResponseDTO();
+                    dto.setId(user.getId());
+                    dto.setUsername(user.getUsername());
+                    dto.setEmail(user.getEmail());
+                    dto.setName(user.getName());
+                    dto.setRoles(user.getRoles()
+                            .stream()
+                            .map(Role::getName)
+                            .collect(Collectors.toSet()));
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     public UserResponseDTO addRoleToUser(Long userId, String roleName) {
