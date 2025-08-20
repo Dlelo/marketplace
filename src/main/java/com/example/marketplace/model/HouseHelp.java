@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Data
 @Table(name = "house_help")
@@ -19,4 +21,22 @@ public class HouseHelp {
 
     @Column(nullable = false)
     private boolean verified;
+
+    private Integer numberOfChildren;
+
+    @ElementCollection
+    private List<String> languages;
+
+    private String levelOfEducation;
+    private String contactPersons;
+    private String homeLocation;
+    private String currentLocation;
+    private String nationalId;
+    private String medicalReport;
+    private String goodConduct;
+    private Integer yearsOfExperience;
+    private String religion;
+
+    @ElementCollection
+    private List<String> skills;
 }
