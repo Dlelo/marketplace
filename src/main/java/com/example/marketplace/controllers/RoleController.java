@@ -4,8 +4,10 @@ import com.example.marketplace.dto.RoleRequestDTO;
 import com.example.marketplace.dto.RoleResponseDTO;
 import com.example.marketplace.model.Role;
 import com.example.marketplace.service.RoleService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,11 +15,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/roles")
 @RequiredArgsConstructor
+@Validated
 public class RoleController {
     private final RoleService roleService;
 
     @PostMapping
-    public ResponseEntity<?> createRole(@RequestBody RoleRequestDTO roleDTO) {
+    public ResponseEntity<?> createRole(@RequestBody @Valid RoleRequestDTO roleDTO) {
         try {
             Role role = new Role();
             role.setName(roleDTO.getName());
