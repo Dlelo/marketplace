@@ -21,4 +21,5 @@ public interface HouseHelpRepository extends JpaRepository<HouseHelp, Long>, Hou
     Optional<HouseHelp> findByUser_Email(String email);
 
     // Optional: List<HouseHelp> findByVerifiedTrue();
+
 }
