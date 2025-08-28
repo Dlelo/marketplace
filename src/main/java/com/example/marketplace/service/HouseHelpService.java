@@ -16,6 +16,10 @@ import java.util.List;
 public class HouseHelpService {
     private final HouseHelpRepository houseHelpRepository;
 
+    public List<HouseHelp> getAllHouseHelps() {
+        return houseHelpRepository.findAll();
+    }
+
     public HouseHelpUpdateResponseDTO updateHouseHelp(Long houseHelpId, HouseHelpUpdateDTO dto) {
         HouseHelp houseHelp = houseHelpRepository.findById(houseHelpId)
                 .orElseThrow(() -> new RuntimeException("HouseHelp not found"));

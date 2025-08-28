@@ -18,6 +18,11 @@ import java.util.List;
 public class HouseHelpController {
     private final HouseHelpService houseHelpService;
 
+    @GetMapping
+    public ResponseEntity<List<HouseHelp>> getAllHouseHelps() {
+        return ResponseEntity.ok(houseHelpService.getAllHouseHelps());
+    }
+
     @PutMapping("/verify/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HouseHelp> verifyHouseHelp(@PathVariable Long id) {
