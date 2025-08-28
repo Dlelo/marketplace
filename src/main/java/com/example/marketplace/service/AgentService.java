@@ -3,6 +3,7 @@ package com.example.marketplace.service;
 import com.example.marketplace.dto.AgentUpdateDTO;
 import com.example.marketplace.dto.AgentUpdateResponseDTO;
 import com.example.marketplace.model.Agent;
+import com.example.marketplace.model.HomeOwner;
 import com.example.marketplace.repository.AgentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AgentService {
     private final AgentRepository agentRepository;
+
+    public List<Agent> getAllAgents() {
+        return agentRepository.findAll();
+    }
 
     public AgentUpdateResponseDTO updateAgent(Long id, AgentUpdateDTO dto) {
         Agent agent =agentRepository.findById(id)

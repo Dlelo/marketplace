@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/homeowner")
 @RequiredArgsConstructor
@@ -16,14 +18,19 @@ public class HomeOwnerController {
 
     private final HomeOwnerService homeOwnerService;
 
+    @GetMapping
+    public ResponseEntity<List<HomeOwner>> getAllHomeOwners() {
+        return ResponseEntity.ok(homeOwnerService.getAllHomeOwners());
+    }
+
     @PutMapping("/verify/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('AGENT','ADMIN')")
     public ResponseEntity<HomeOwner> verifyHomeOwner(@PathVariable Long id) {
         return ResponseEntity.ok(homeOwnerService.verifyHomeOwner(id));
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('HOMEOWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'AGENT','HOMEOWNER')")
     public ResponseEntity<HomeOwnerUpdateResponseDTO> updateHomeOwner(
             @PathVariable Long id,
             @RequestBody HomeOwnerUpdateDTO dto

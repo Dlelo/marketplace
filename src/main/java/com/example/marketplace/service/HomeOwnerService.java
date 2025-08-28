@@ -4,6 +4,7 @@ import com.example.marketplace.dto.HomeOwnerUpdateDTO;
 import com.example.marketplace.dto.HomeOwnerUpdateResponseDTO;
 import com.example.marketplace.model.HomeOwner;
 
+import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.repository.HomeOwnerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HomeOwnerService {
     private final HomeOwnerRepository homeOwnerRepository;
+
+    public List<HomeOwner> getAllHomeOwners() {
+        return homeOwnerRepository.findAll();
+    }
 
     public HomeOwnerUpdateResponseDTO updateHomeOwner(Long id, HomeOwnerUpdateDTO dto) {
         HomeOwner homeOwner = homeOwnerRepository.findById(id)
