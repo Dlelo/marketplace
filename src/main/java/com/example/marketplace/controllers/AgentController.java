@@ -30,7 +30,7 @@ public class AgentController {
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'AGENT')")
     public ResponseEntity<AgentUpdateResponseDTO> updateAgent(
             @PathVariable Long id,
             @RequestBody AgentUpdateDTO dto
