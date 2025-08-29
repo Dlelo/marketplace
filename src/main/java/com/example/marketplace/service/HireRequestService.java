@@ -10,6 +10,8 @@ import com.example.marketplace.repository.HireRequestRepository;
 import com.example.marketplace.repository.HouseHelpRepository;
 import com.example.marketplace.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -79,5 +81,9 @@ public class HireRequestService {
     public User findHouseOwnerByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    public Page<HireRequest> getAllHireRequests(Pageable pageable) {
+        return hireRequestRepository.findAll(pageable);
     }
 }

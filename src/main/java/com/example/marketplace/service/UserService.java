@@ -79,6 +79,7 @@ public class UserService {
                     return dto;
                 });
     }
+
     public UserResponseDTO addRoleToUser(Long userId, String roleName) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));

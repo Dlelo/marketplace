@@ -5,11 +5,11 @@ import com.example.marketplace.dto.HomeOwnerUpdateResponseDTO;
 import com.example.marketplace.model.HomeOwner;
 import com.example.marketplace.service.HomeOwnerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/homeowner")
@@ -19,8 +19,8 @@ public class HomeOwnerController {
     private final HomeOwnerService homeOwnerService;
 
     @GetMapping
-    public ResponseEntity<List<HomeOwner>> getAllHomeOwners() {
-        return ResponseEntity.ok(homeOwnerService.getAllHomeOwners());
+    public ResponseEntity<Page<HomeOwner>> getAllHomeOwners(Pageable pageable) {
+        return ResponseEntity.ok(homeOwnerService.getAllHomeOwners(pageable));
     }
 
     @PutMapping("/verify/{id}")

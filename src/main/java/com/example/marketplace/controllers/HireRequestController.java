@@ -3,10 +3,13 @@ package com.example.marketplace.controllers;
 import com.example.marketplace.dto.HireRequestDTO;
 import com.example.marketplace.dto.HireRequestResponseDTO;
 import com.example.marketplace.enums.RequestStatus;
+import com.example.marketplace.model.HireRequest;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.repository.HouseHelpRepository;
 import com.example.marketplace.service.HireRequestService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -20,6 +23,11 @@ import java.util.List;
 public class HireRequestController {
     private final HireRequestService hireRequestService;
     private final HouseHelpRepository houseHelpRepository;
+
+    @GetMapping
+    public ResponseEntity<Page<HireRequest>> getAllHireRequests(Pageable pageable) {
+        return ResponseEntity.ok(hireRequestService.getAllHireRequests(pageable));
+    }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('HOMEOWNER','AGENT','ADMIN')")

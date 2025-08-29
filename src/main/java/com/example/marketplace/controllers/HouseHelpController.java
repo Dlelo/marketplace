@@ -6,6 +6,8 @@ import com.example.marketplace.dto.HouseHelpUpdateResponseDTO;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.service.HouseHelpService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +21,8 @@ public class HouseHelpController {
     private final HouseHelpService houseHelpService;
 
     @GetMapping
-    public ResponseEntity<List<HouseHelp>> getAllHouseHelps() {
-        return ResponseEntity.ok(houseHelpService.getAllHouseHelps());
+    public ResponseEntity<Page<HouseHelp>> getAllHouseHelps(Pageable pageable) {
+        return ResponseEntity.ok(houseHelpService.getAllHouseHelps(pageable));
     }
 
     @PutMapping("/verify/{id}")
