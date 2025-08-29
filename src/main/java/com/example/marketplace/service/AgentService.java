@@ -3,9 +3,10 @@ package com.example.marketplace.service;
 import com.example.marketplace.dto.AgentUpdateDTO;
 import com.example.marketplace.dto.AgentUpdateResponseDTO;
 import com.example.marketplace.model.Agent;
-import com.example.marketplace.model.HomeOwner;
 import com.example.marketplace.repository.AgentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,8 +17,8 @@ import java.util.List;
 public class AgentService {
     private final AgentRepository agentRepository;
 
-    public List<Agent> getAllAgents() {
-        return agentRepository.findAll();
+    public Page<Agent> getAllAgents(Pageable pageable) {
+        return agentRepository.findAll(pageable);
     }
 
     public AgentUpdateResponseDTO updateAgent(Long id, AgentUpdateDTO dto) {

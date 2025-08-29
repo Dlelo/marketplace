@@ -6,6 +6,8 @@ import com.example.marketplace.dto.HouseHelpUpdateResponseDTO;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.repository.HouseHelpRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,8 +18,8 @@ import java.util.List;
 public class HouseHelpService {
     private final HouseHelpRepository houseHelpRepository;
 
-    public List<HouseHelp> getAllHouseHelps() {
-        return houseHelpRepository.findAll();
+    public Page<HouseHelp> getAllHouseHelps(Pageable pageable) {
+        return houseHelpRepository.findAll(pageable);
     }
 
     public HouseHelpUpdateResponseDTO updateHouseHelp(Long houseHelpId, HouseHelpUpdateDTO dto) {

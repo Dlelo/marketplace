@@ -14,7 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,9 +64,8 @@ public class UserService {
         return response;
     }
 
-    public List<UserResponseDTO> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
+    public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable)
                 .map(user -> {
                     UserResponseDTO dto = new UserResponseDTO();
                     dto.setId(user.getId());
@@ -77,10 +77,8 @@ public class UserService {
                             .map(Role::getName)
                             .collect(Collectors.toSet()));
                     return dto;
-                })
-                .collect(Collectors.toList());
+                });
     }
-
     public UserResponseDTO addRoleToUser(Long userId, String roleName) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));

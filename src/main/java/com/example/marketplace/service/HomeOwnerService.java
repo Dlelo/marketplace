@@ -4,9 +4,10 @@ import com.example.marketplace.dto.HomeOwnerUpdateDTO;
 import com.example.marketplace.dto.HomeOwnerUpdateResponseDTO;
 import com.example.marketplace.model.HomeOwner;
 
-import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.repository.HomeOwnerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,8 +18,8 @@ import java.util.List;
 public class HomeOwnerService {
     private final HomeOwnerRepository homeOwnerRepository;
 
-    public List<HomeOwner> getAllHomeOwners() {
-        return homeOwnerRepository.findAll();
+    public Page<HomeOwner> getAllHomeOwners(Pageable pageable) {
+        return homeOwnerRepository.findAll(pageable);
     }
 
     public HomeOwnerUpdateResponseDTO updateHomeOwner(Long id, HomeOwnerUpdateDTO dto) {
