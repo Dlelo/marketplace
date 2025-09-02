@@ -4,6 +4,7 @@ import com.example.marketplace.dto.HireRequestDTO;
 import com.example.marketplace.dto.HireRequestResponseDTO;
 import com.example.marketplace.enums.RequestStatus;
 import com.example.marketplace.model.HireRequest;
+import com.example.marketplace.model.HomeOwner;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.model.User;
 import com.example.marketplace.repository.HireRequestRepository;
@@ -23,8 +24,18 @@ public class HireRequestService {
     private final HireRequestRepository hireRequestRepository;
     private final UserRepository userRepository;
     private final HouseHelpRepository houseHelpRepository;
+    private final HomeOwnerService homeOwnerService;
 
-    public HireRequestResponseDTO createHireRequest(HireRequestDTO hireRequestDTO, User houseOwner) {
+    public HireRequestResponseDTO createHireRequest(HireRequestDTO hireRequestDTO, HomeOwner homeOwner, boolean paymentSuccess) {
+        List<String> missingFields = homeOwnerService.getMissingFields(homeOwner);
+        if (!missingFields.isEmpty()) {
+            throw new RuntimeException("Profile incomplete. Missing fields: " + String.join(", ", missingFields));
+        }
+
+        if (!paymentSuccess && !homeOwner.isSubscriptionActive()) {
+            throw new RuntimeException("You must have an active subscription or complete a payment to hire.");
+        }
+
         HouseHelp houseHelp = houseHelpRepository.findById(hireRequestDTO.getHouseHelpId())
                 .orElseThrow(() -> new IllegalArgumentException("HouseHelp not found"));
         if (!houseHelp.isVerified()) {
@@ -32,14 +43,14 @@ public class HireRequestService {
         }
 
         HireRequest hireRequest = new HireRequest();
-        hireRequest.setHouseOwner(houseOwner);
+        hireRequest.setHomeOwner(homeOwner);
         hireRequest.setHouseHelp(houseHelp.getUser());
         hireRequest.setStatus(RequestStatus.PENDING);
         HireRequest savedRequest = hireRequestRepository.save(hireRequest);
 
         HireRequestResponseDTO response = new HireRequestResponseDTO();
         response.setId(savedRequest.getId());
-        response.setHouseOwnerId(savedRequest.getHouseOwner().getId());
+        response.setHomeOwnerId(savedRequest.getHomeOwner().getId());
         response.setHouseHelpId(savedRequest.getHouseHelp().getId());
         response.setStatus(savedRequest.getStatus());
         return response;
@@ -57,7 +68,7 @@ public class HireRequestService {
                 .map(request -> {
                     HireRequestResponseDTO dto = new HireRequestResponseDTO();
                     dto.setId(request.getId());
-                    dto.setHouseOwnerId(request.getHouseOwner().getId());
+                    dto.setHomeOwnerId(request.getHomeOwner().getId());
                     dto.setHouseHelpId(request.getHouseHelp().getId());
                     dto.setStatus(request.getStatus());
                     return dto;
@@ -70,7 +81,7 @@ public class HireRequestService {
                 .map(request -> {
                     HireRequestResponseDTO dto = new HireRequestResponseDTO();
                     dto.setId(request.getId());
-                    dto.setHouseOwnerId(request.getHouseOwner().getId());
+                    dto.setHomeOwnerId(request.getHomeOwner().getId());
                     dto.setHouseHelpId(request.getHouseHelp().getId());
                     dto.setStatus(request.getStatus());
                     return dto;

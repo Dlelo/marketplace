@@ -57,7 +57,7 @@ public class HomeOwnerService {
         return homeOwnerRepository.save(homeOwner);
     }
 
-    private List<String> getMissingFields(HomeOwner homeOwner) {
+    List<String> getMissingFields(HomeOwner homeOwner) {
         List<String> missing = new ArrayList<>();
 
         if (isBlank(homeOwner.getFullName())) missing.add("fullName");

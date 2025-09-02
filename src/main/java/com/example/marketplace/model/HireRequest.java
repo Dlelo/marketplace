@@ -17,8 +17,13 @@ public class HireRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    private boolean paid;
+
     @ManyToOne
-    private User houseOwner;
+    @JoinColumn(name = "home_owner_id")
+    private HomeOwner homeOwner;
 
     @ManyToOne
     private User houseHelp;
@@ -30,5 +35,4 @@ public class HireRequest {
 
     private String message;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
 }

@@ -7,6 +7,8 @@ import com.example.marketplace.model.HireRequest;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.repository.HouseHelpRepository;
 import com.example.marketplace.service.HireRequestService;
+import com.example.marketplace.service.HouseHelpService;
+import com.example.marketplace.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +24,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HireRequestController {
     private final HireRequestService hireRequestService;
-    private final HouseHelpRepository houseHelpRepository;
+    private final SubscriptionService subscriptionService;
+    private final HouseHelpService houseHelpService;
 
     @GetMapping
     public ResponseEntity<Page<HireRequest>> getAllHireRequests(Pageable pageable) {
@@ -33,6 +36,12 @@ public class HireRequestController {
     @PreAuthorize("hasAnyRole('HOMEOWNER','AGENT','ADMIN')")
     public ResponseEntity<HireRequestResponseDTO> createHireRequest(@RequestBody HireRequestDTO hireRequestDTO, Authentication authentication) {
         String email = authentication.getName();
+        boolean hasActiveSubscription = subscriptionService.hasActiveSubscription(email);
+        boolean hasSuccessfulPayment = paymentService.hasSuccessfulPayment(email);
+
+        if (!hasActiveSubscription && !hasSuccessfulPayment) {
+            return ResponseEntity.status(402).body("Active subscription or successful payment required to hire a househelp.");
+        }
         return ResponseEntity.ok(hireRequestService.createHireRequest(hireRequestDTO, hireRequestService.findHouseOwnerByEmail(email)));
     }
 
