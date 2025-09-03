@@ -5,9 +5,9 @@ import com.example.marketplace.dto.HireRequestResponseDTO;
 import com.example.marketplace.enums.RequestStatus;
 import com.example.marketplace.model.HireRequest;
 import com.example.marketplace.model.HouseHelp;
-import com.example.marketplace.repository.HouseHelpRepository;
 import com.example.marketplace.service.HireRequestService;
 import com.example.marketplace.service.HouseHelpService;
+import com.example.marketplace.service.PaymentService;
 import com.example.marketplace.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +25,7 @@ import java.util.List;
 public class HireRequestController {
     private final HireRequestService hireRequestService;
     private final SubscriptionService subscriptionService;
+    private final PaymentService paymentService;
     private final HouseHelpService houseHelpService;
 
     @GetMapping
@@ -34,27 +35,31 @@ public class HireRequestController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('HOMEOWNER','AGENT','ADMIN')")
-    public ResponseEntity<HireRequestResponseDTO> createHireRequest(@RequestBody HireRequestDTO hireRequestDTO, Authentication authentication) {
+    public ResponseEntity<?> createHireRequest(@RequestBody HireRequestDTO hireRequestDTO, Authentication authentication) {
         String email = authentication.getName();
         boolean hasActiveSubscription = subscriptionService.hasActiveSubscription(email);
         boolean hasSuccessfulPayment = paymentService.hasSuccessfulPayment(email);
 
         if (!hasActiveSubscription && !hasSuccessfulPayment) {
-            return ResponseEntity.status(402).body("Active subscription or successful payment required to hire a househelp.");
+            return ResponseEntity
+                    .status(402)
+                    .body("Active subscription or successful payment required to hire a househelp.");
         }
-        return ResponseEntity.ok(hireRequestService.createHireRequest(hireRequestDTO, hireRequestService.findHouseOwnerByEmail(email)));
+
+        HireRequestResponseDTO response = hireRequestService.createHireRequest(hireRequestDTO, email);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/househelp/{houseHelpId}/verify")
     @PreAuthorize("hasAnyRole('AGENT','ADMIN')")
     public ResponseEntity<String> verifyHouseHelp(@PathVariable Long houseHelpId) {
-        HouseHelp houseHelp = houseHelpRepository.findById(houseHelpId)
+        HouseHelp houseHelp = houseHelpService.findById(houseHelpId)
                 .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
         if (houseHelp.isVerified()) {
             return ResponseEntity.ok("HouseHelp is already verified");
         }
         houseHelp.setVerified(true);
-        houseHelpRepository.save(houseHelp);
+        houseHelpService.save(houseHelp);
         return ResponseEntity.ok("HouseHelp verified successfully");
     }
 
