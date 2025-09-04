@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface HireRequestRepository extends JpaRepository<HireRequest, Long> {
     List<HireRequest> findByHouseHelp_Id(Long houseHelpId);
-    List<HireRequest> findByHouseOwner_Id(Long houseOwnerUserId);
+    List<HireRequest> findByHomeOwner_Id(Long homeOwnerUserId);
 
     interface HouseHelpCustomRepository {
 

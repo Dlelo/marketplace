@@ -3,6 +3,7 @@ package com.example.marketplace.service;
 import com.example.marketplace.dto.HouseHelpFilterDTO;
 import com.example.marketplace.dto.HouseHelpUpdateDTO;
 import com.example.marketplace.dto.HouseHelpUpdateResponseDTO;
+import com.example.marketplace.dto.HouseHelpVerificationResponseDTO;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.repository.HouseHelpRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,19 +47,22 @@ public class HouseHelpService {
         return new HouseHelpUpdateResponseDTO(updated, missingFields);
     }
 
-    public HouseHelp verifyHouseHelp(Long houseHelpId) {
+    public HouseHelpVerificationResponseDTO verifyHouseHelp(Long houseHelpId) {
         HouseHelp houseHelp = houseHelpRepository.findById(houseHelpId)
                 .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
 
         List<String> missingFields = getMissingFields(houseHelp);
 
         if (!missingFields.isEmpty()) {
-            throw new RuntimeException("Profile incomplete. Missing fields: " + String.join(", ", missingFields));
+            return HouseHelpVerificationResponseDTO.fromEntity(houseHelp, missingFields);
         }
 
         houseHelp.setVerified(true);
-        return houseHelpRepository.save(houseHelp);
+        HouseHelp saved = houseHelpRepository.save(houseHelp);
+
+        return HouseHelpVerificationResponseDTO.fromEntity(saved, List.of());
     }
+
 
     private List<String> getMissingFields(HouseHelp houseHelp) {
         List<String> missing = new ArrayList<>();

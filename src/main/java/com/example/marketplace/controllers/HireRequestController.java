@@ -2,6 +2,7 @@ package com.example.marketplace.controllers;
 
 import com.example.marketplace.dto.HireRequestDTO;
 import com.example.marketplace.dto.HireRequestResponseDTO;
+import com.example.marketplace.dto.HouseHelpVerificationResponseDTO;
 import com.example.marketplace.enums.RequestStatus;
 import com.example.marketplace.model.HireRequest;
 import com.example.marketplace.model.HouseHelp;
@@ -52,15 +53,8 @@ public class HireRequestController {
 
     @PostMapping("/househelp/{houseHelpId}/verify")
     @PreAuthorize("hasAnyRole('AGENT','ADMIN')")
-    public ResponseEntity<String> verifyHouseHelp(@PathVariable Long houseHelpId) {
-        HouseHelp houseHelp = houseHelpService.findById(houseHelpId)
-                .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
-        if (houseHelp.isVerified()) {
-            return ResponseEntity.ok("HouseHelp is already verified");
-        }
-        houseHelp.setVerified(true);
-        houseHelpService.save(houseHelp);
-        return ResponseEntity.ok("HouseHelp verified successfully");
+    public ResponseEntity<HouseHelpVerificationResponseDTO> verifyHouseHelp(@PathVariable Long houseHelpId) {
+        return ResponseEntity.ok(houseHelpService.verifyHouseHelp(houseHelpId));
     }
 
     @PutMapping("/{id}/status")
@@ -76,9 +70,9 @@ public class HireRequestController {
         return ResponseEntity.ok(hireRequestService.getRequestsForHouseHelp(houseHelpId));
     }
 
-    @GetMapping("/homeowner/{houseOwnerId}")
+    @GetMapping("/homeowner/{homeOwnerId}")
     @PreAuthorize("hasRole('HOMEOWNER')")
-    public ResponseEntity<List<HireRequestResponseDTO>> getRequestsForHouseOwner(@PathVariable Long houseOwnerId) {
-        return ResponseEntity.ok(hireRequestService.findByHouseOwner_Id(houseOwnerId));
+    public ResponseEntity<List<HireRequestResponseDTO>> getRequestsForHomeOwner(@PathVariable Long homeOwnerId) {
+        return ResponseEntity.ok(hireRequestService.findByHomeOwner_Id(homeOwnerId));
     }
 }

@@ -75,8 +75,8 @@ public class HireRequestService {
     /**
      * Get requests created by a specific homeowner.
      */
-    public List<HireRequestResponseDTO> findByHouseOwner_Id(Long houseOwnerId) {
-        return hireRequestRepository.findByHouseOwner_Id(houseOwnerId).stream()
+    public List<HireRequestResponseDTO> findByHomeOwner_Id(Long homeOwnerId) {
+        return hireRequestRepository.findByHomeOwner_Id(homeOwnerId).stream()
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());
     }
