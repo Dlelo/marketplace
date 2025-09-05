@@ -12,4 +12,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     // Get the most recent successful payment for a user
     Optional<Payment> findFirstByUser_EmailAndStatusOrderByCreatedAtDesc(String email, PaymentStatus status);
+
+    // 🔹 Needed for Daraja callback processing
+    Optional<Payment> findByTransactionId(String transactionId);
 }
