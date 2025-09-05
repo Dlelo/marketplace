@@ -42,7 +42,7 @@ public class InterviewService {
         return interviewRepository.findByHireRequest_HouseHelp_Id(houseHelpId);
     }
 
-    public List<Interview> getInterviewsForHouseOwner(Long houseOwnerId) {
-        return interviewRepository.findByHireRequest_HouseOwner_Id(houseOwnerId);
+    public List<Interview> getInterviewsForHouseOwner(Long homeOwnerId) {
+        return interviewRepository.findByHireRequest_HomeOwner_Id(homeOwnerId);
     }
 }
