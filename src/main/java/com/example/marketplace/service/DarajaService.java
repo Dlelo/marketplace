@@ -1,14 +1,15 @@
 package com.example.marketplace.service;
 
-import com.example.marketplace.config.DarajaConfig;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,52 +17,97 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DarajaService {
 
-    private final DarajaConfig darajaConfig;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    private static final String OAUTH_URL = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
-    private static final String STK_PUSH_URL = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
+    @Value("${daraja.consumerKey}")
+    private String consumerKey;
 
-    public String getAccessToken() {
-        String credentials = darajaConfig.getConsumerKey() + ":" + darajaConfig.getConsumerSecret();
-        String encoded = Base64.getEncoder().encodeToString(credentials.getBytes());
+    @Value("${daraja.consumerSecret}")
+    private String consumerSecret;
+
+    @Value("${daraja.baseUrl}")
+    private String baseUrl;
+
+    @Value("${daraja.businessShortCode}")
+    private String businessShortCode;
+
+    @Value("${daraja.passkey}")
+    private String passkey;
+
+    /**
+     * Generate OAuth token
+     */
+    public String generateAccessToken() {
+        String url = baseUrl + "/oauth/v1/generate?grant_type=client_credentials";
+
+        // Build Basic Auth header
+        String auth = consumerKey + ":" + consumerSecret;
+        String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Basic " + encoded);
+        headers.set("Authorization", "Basic " + encodedAuth);
 
-        HttpEntity<String> entity = new HttpEntity<>(headers);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
 
-        ResponseEntity<Map> response = restTemplate.exchange(OAUTH_URL, HttpMethod.GET, entity, Map.class);
+        ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, request, Map.class);
 
-        return (String) response.getBody().get("access_token");
+        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            return (String) response.getBody().get("access_token");
+        }
+        throw new RuntimeException("Failed to get access token from Daraja");
     }
 
-    public Map<String, Object> lipaNaMpesa(String phoneNumber, double amount, String accountReference, String transactionDesc) {
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        String password = Base64.getEncoder().encodeToString(
-                (darajaConfig.getShortCode() + darajaConfig.getPasskey() + timestamp).getBytes()
-        );
+    /**
+     * Generate Timestamp (yyyyMMddHHmmss)
+     */
+    private String generateTimestamp() {
+        return new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+    }
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("BusinessShortCode", darajaConfig.getShortCode());
-        body.put("Password", password);
-        body.put("Timestamp", timestamp);
-        body.put("TransactionType", "CustomerPayBillOnline");
-        body.put("Amount", amount);
-        body.put("PartyA", phoneNumber);
-        body.put("PartyB", darajaConfig.getShortCode());
-        body.put("PhoneNumber", phoneNumber);
-        body.put("CallBackURL", darajaConfig.getCallbackUrl());
-        body.put("AccountReference", accountReference);
-        body.put("TransactionDesc", transactionDesc);
+    /**
+     * Generate Password (Base64(BusinessShortCode + Passkey + Timestamp))
+     */
+    private String generatePassword(String timestamp) {
+        String dataToEncode = businessShortCode + passkey + timestamp;
+        return Base64.getEncoder().encodeToString(dataToEncode.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * STK Push Request
+     */
+    public Map<String, Object> lipaNaMpesa(String phoneNumber, double amount, String accountReference, String transactionDesc) {
+        String accessToken = generateAccessToken();
+
+        String url = baseUrl + "/mpesa/stkpush/v1/processrequest";
+
+        String timestamp = generateTimestamp();
+        String password = generatePassword(timestamp);
 
         HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(getAccessToken());
 
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+        Map<String, Object> request = new HashMap<>();
+        request.put("BusinessShortCode", businessShortCode);
+        request.put("Password", password);
+        request.put("Timestamp", timestamp);
+        request.put("TransactionType", "CustomerPayBillOnline");
+        request.put("Amount", amount);
+        request.put("PartyA", phoneNumber);
+        request.put("PartyB", businessShortCode);
+        request.put("PhoneNumber", phoneNumber);
+        request.put("CallBackURL", "https://your-domain.com/api/payments/webhook/mpesa");
+        request.put("AccountReference", accountReference);
+        request.put("TransactionDesc", transactionDesc);
 
-        ResponseEntity<Map> response = restTemplate.postForEntity(STK_PUSH_URL, request, Map.class);
-        return response.getBody();
+
+        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(request, headers);
+
+        ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Map.class);
+
+        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            return response.getBody();
+        }
+        throw new RuntimeException("Failed to initiate STK Push request");
     }
 }
