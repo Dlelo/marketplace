@@ -50,17 +50,36 @@ public class PaymentService {
     /**
      * Process callback from Daraja
      */
+    @SuppressWarnings("unchecked")
     public void handleDarajaCallback(Map<String, Object> payload) {
-        Map<String, Object> stkCallback = (Map<String, Object>) payload.get("Body");
-        Map<String, Object> callback = (Map<String, Object>) stkCallback.get("stkCallback");
+        Map<String, Object> body = (Map<String, Object>) payload.get("Body");
+        Map<String, Object> stkCallback = (Map<String, Object>) body.get("stkCallback");
 
-        String checkoutRequestId = (String) callback.get("CheckoutRequestID");
-        int resultCode = (Integer) callback.get("ResultCode");
+        String checkoutRequestId = (String) stkCallback.get("CheckoutRequestID");
+        int resultCode = (Integer) stkCallback.get("ResultCode");
+        String resultDesc = (String) stkCallback.get("ResultDesc");
 
         Payment payment = paymentRepository.findByTransactionId(checkoutRequestId)
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
+                .orElseThrow(() -> new RuntimeException("Payment not found for CheckoutRequestID: " + checkoutRequestId));
 
         if (resultCode == 0) {
+            // Extract metadata
+            Map<String, Object> callbackMetadata = (Map<String, Object>) stkCallback.get("CallbackMetadata");
+            if (callbackMetadata != null) {
+                var items = (Iterable<Map<String, Object>>) callbackMetadata.get("Item");
+                for (Map<String, Object> item : items) {
+                    String name = (String) item.get("Name");
+                    Object value = item.get("Value");
+
+                    if ("MpesaReceiptNumber".equals(name)) {
+                        payment.setTransactionId(value.toString());
+                    }
+                    if ("Amount".equals(name)) {
+                        payment.setAmount(Double.valueOf(value.toString()));
+                    }
+                }
+            }
+
             payment.setStatus(PaymentStatus.SUCCESS);
             subscriptionService.handleSuccessfulPayment(payment.getUser().getEmail(), payment);
         } else {
