@@ -1,6 +1,7 @@
 package com.example.marketplace.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,8 +17,9 @@ public class HouseHelp {
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonBackReference
+    @JsonIgnoreProperties({"houseHelp"})
     private User user;
+
 
     @Column(nullable = false)
     private boolean verified;

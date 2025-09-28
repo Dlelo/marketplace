@@ -1,5 +1,6 @@
 package com.example.marketplace.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,4 +38,8 @@ public class User {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<Role> roles = new HashSet<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties({"user"})
+    private HouseHelp houseHelp;
 }
