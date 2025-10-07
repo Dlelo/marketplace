@@ -3,6 +3,8 @@ package com.example.marketplace.controllers;
 import com.example.marketplace.dto.LoginRequest;
 import com.example.marketplace.dto.RegisterRequest;
 import com.example.marketplace.dto.UserResponseDTO;
+import com.example.marketplace.model.User;
+import com.example.marketplace.security.CustomUserDetails;
 import com.example.marketplace.security.JWTUtil;
 import com.example.marketplace.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -60,6 +64,27 @@ public class AuthController {
         }
     }
 
+//    @PostMapping("/login")
+//    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+//        try {
+//            if (loginRequest.getEmail() == null || loginRequest.getPassword() == null) {
+//                return ResponseEntity.badRequest().body("Email and password are required.");
+//            }
+//            Authentication authentication = authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(
+//                            loginRequest.getEmail(),
+//                            loginRequest.getPassword()
+//                    )
+//            );
+//            String token = jwtUtil.generateToken(authentication.getName());
+//            return ResponseEntity.ok(Collections.singletonMap("token", token));
+//        } catch (BadCredentialsException e) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
+//        }
+//    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
@@ -72,8 +97,27 @@ public class AuthController {
                             loginRequest.getPassword()
                     )
             );
-            String token = jwtUtil.generateToken(authentication.getName());
-            return ResponseEntity.ok(Collections.singletonMap("token", token));
+
+            // Extract user details from authentication
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            User user = userDetails.getUser();
+
+            // Extract role - adjust based on your User entity's role structure
+            String role = user.getRoles().toString();
+            // If getRoles() returns an Enum, use: user.getRoles().name()
+            // If getRoles() returns a collection, you might need to adjust this
+
+            // Generate token with email, user ID, and role
+            String token = jwtUtil.generateToken(authentication.getName(), user.getId(), role);
+
+            // Return enhanced response with user information
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("userId", user.getId());
+            response.put("email", authentication.getName());
+            response.put("role", role);
+
+            return ResponseEntity.ok(response);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         } catch (Exception e) {

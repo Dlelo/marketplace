@@ -19,19 +19,46 @@ import java.util.stream.Collectors;
 @Component
 public class JWTUtil {
 
-    private static final String SECRET_KEY = "your-256-bit-secret-must-be-at-least-32-chars-long";
+    private static final String SECRET_KEY = "yoxur-256-bit-secret-must-be-at-least-32-chars-long";
     private static final Key SIGNING_KEY = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     private static final long EXPIRATION_HOURS = 24;
 
-    public String generateToken(String email) {
+//    public String generateToken(String email) {
+//        return Jwts.builder()
+//                .subject(email)
+//                .issuedAt(new Date())
+//                .expiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(EXPIRATION_HOURS)))
+//                .signWith(SIGNING_KEY)
+//                .compact();
+//    }
+
+    public String generateToken(String email, Long userId, String role) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("role", role);
+
         return Jwts.builder()
-                .subject(email)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(EXPIRATION_HOURS)))
+                .setClaims(claims)
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(EXPIRATION_HOURS)))
                 .signWith(SIGNING_KEY)
                 .compact();
     }
 
+    public String generateToken(String email) {
+        return generateToken(email, null, null);
+    }
+
+    public Long extractUserId(String token) {
+        Claims claims = getClaims(token);
+        return claims.get("userId", Long.class);
+    }
+
+    public String extractRole(String token) {
+        Claims claims = getClaims(token);
+        return claims.get("role", String.class);
+    }
 
     public String extractUsername(String token) {
         return getClaims(token).getSubject();
