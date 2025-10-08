@@ -98,30 +98,48 @@ public class AuthController {
                     )
             );
 
-            // Extract user details from authentication
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            User user = userDetails.getUser();
+//            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+//            User user = userDetails.getUser();
+//
+//           String role = user.getRoles().toString();
 
-            // Extract role - adjust based on your User entity's role structure
-            String role = user.getRoles().toString();
-            // If getRoles() returns an Enum, use: user.getRoles().name()
-            // If getRoles() returns a collection, you might need to adjust this
+            Object principal = authentication.getPrincipal();
+            Long userId = null;
+            String role = null;
+            String email = authentication.getName();
 
-            // Generate token with email, user ID, and role
-            String token = jwtUtil.generateToken(authentication.getName(), user.getId(), role);
+            if (principal instanceof CustomUserDetails) {
+                CustomUserDetails userDetails = (CustomUserDetails) principal;
+                User user = userDetails.getUser();
+                userId = user.getId();
+                role = extractRoleFromUser(user);
+            } else {
+               User user = userService.findByEmail(email);
+                userId = user.getId();
+                role = extractRoleFromUser(user);
+            }
 
-            // Return enhanced response with user information
+            String token = jwtUtil.generateToken(email, userId, role);
+
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
-            response.put("userId", user.getId());
-            response.put("email", authentication.getName());
+            response.put("userId", userId);
+            response.put("email",email);
             response.put("role", role);
 
             return ResponseEntity.ok(response);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred" + e.getMessage());
         }
+    }
+
+    private String extractRoleFromUser(User user) {
+        if (user.getRoles() == null || user.getRoles().toString().isEmpty()) {
+            return "HOMEOWNER";
+        }
+        return user.getRoles().toString().replace("ROLE_", "");
     }
 }
