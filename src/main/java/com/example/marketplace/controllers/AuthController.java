@@ -123,9 +123,6 @@ public class AuthController {
 
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
-            response.put("userId", userId);
-            response.put("email",email);
-            response.put("role", role);
 
             return ResponseEntity.ok(response);
         } catch (BadCredentialsException e) {
