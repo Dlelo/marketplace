@@ -42,4 +42,8 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnoreProperties({"user"})
     private HouseHelp houseHelp;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties({"user"})
+    private HomeOwner homeOwner;
 }

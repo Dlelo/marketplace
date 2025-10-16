@@ -1,5 +1,6 @@
 package com.example.marketplace.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -25,9 +26,9 @@ public class HomeOwner {
     private Integer numberOfDependents;
     private String idDocument;
 
-
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"homeOwner"})
     private User user;
 
     private boolean verified = false;

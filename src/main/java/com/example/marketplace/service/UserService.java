@@ -114,4 +114,31 @@ public class UserService {
         houseHelp.setVerified(true);
         return houseHelpRepository.save(houseHelp);
     }
+    public UserResponseDTO getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        return mapToUserResponseDTO(user);
+    }
+
+    private UserResponseDTO mapToUserResponseDTO(User user) {
+        UserResponseDTO dto = new UserResponseDTO();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setUsername(user.getUsername());
+        dto.setRoles(
+                user.getRoles().stream()
+                        .map(role -> role.getName())
+                        .collect(Collectors.toSet())
+        );
+
+        if (user.getHouseHelp() != null) {
+            dto.setId(user.getHouseHelp().getId());
+        }
+
+        if (user.getHomeOwner() != null) {
+            dto.setId(user.getHomeOwner().getId());
+        }
+        return dto;
+    }
 }

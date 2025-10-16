@@ -38,4 +38,15 @@ public class UserController {
     public ResponseEntity<Page<UserResponseDTO>> listUsers(Pageable pageable) {
         return ResponseEntity.ok(userService.getAllUsers(pageable));
     }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'AGENT', 'HOUSEHELP', 'HOMEOWNER')")
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        try {
+            UserResponseDTO user = userService.getUserById(id);
+            return ResponseEntity.ok(user);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 }
