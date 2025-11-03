@@ -21,9 +21,13 @@ import java.util.List;
 public class HouseHelpController {
     private final HouseHelpService houseHelpService;
 
-    @GetMapping
-    public ResponseEntity<Page<HouseHelp>> getAllHouseHelps(Pageable pageable) {
-        return ResponseEntity.ok(houseHelpService.getAllHouseHelps(pageable));
+    @PostMapping("/search")
+    @PreAuthorize("hasAnyRole('AGENT','HOMEOWNER','ADMIN')")
+    public ResponseEntity<Page<HouseHelp>> searchHouseHelps(
+            @RequestBody HouseHelpFilterDTO filter,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(houseHelpService.findByFilterAndPage(filter, pageable));
     }
 
     @PutMapping("/verify/{id}")
@@ -33,11 +37,6 @@ public class HouseHelpController {
         return ResponseEntity.ok(houseHelpService.verifyHouseHelp(houseHelpId));
     }
 
-    @PostMapping("/filter")
-    @PreAuthorize("hasAnyRole('AGENT','HOMEOWNER','ADMIN')")
-    public ResponseEntity<List<HouseHelp>> filterHouseHelps(@RequestBody HouseHelpFilterDTO filter) {
-        return ResponseEntity.ok(houseHelpService.findByFilter(filter));
-    }
 
     @PatchMapping("/{id}")
     public HouseHelpUpdateResponseDTO updateHouseHelp(@PathVariable Long id, @RequestBody HouseHelpUpdateDTO dto) {

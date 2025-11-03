@@ -6,13 +6,16 @@ import com.example.marketplace.dto.HouseHelpUpdateResponseDTO;
 import com.example.marketplace.dto.HouseHelpVerificationResponseDTO;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.repository.HouseHelpRepository;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -63,6 +66,28 @@ public class HouseHelpService {
         return HouseHelpVerificationResponseDTO.fromEntity(saved, List.of());
     }
 
+    public Page<HouseHelp> findByFilterAndPage(HouseHelpFilterDTO filter, Pageable pageable) {
+        return houseHelpRepository.findAll(buildSpecification(filter), pageable);
+    }
+    private Specification<HouseHelp> buildSpecification(HouseHelpFilterDTO filter) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (filter.getLocation() != null && !filter.getLocation().isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("currentLocation")), "%" + filter.getLocation().toLowerCase() + "%"));
+            }
+
+            if (filter.getAvailability() != null) {
+                predicates.add(cb.equal(root.get("availability"), filter.getAvailability()));
+            }
+
+            if (filter.getStatus() != null) {
+                predicates.add(cb.equal(root.get("status"), filter.getStatus()));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
 
     private List<String> getMissingFields(HouseHelp houseHelp) {
         List<String> missing = new ArrayList<>();
@@ -87,7 +112,4 @@ public class HouseHelpService {
         return value == null || value.trim().isEmpty();
     }
 
-    public List<HouseHelp> findByFilter(HouseHelpFilterDTO filter) {
-        return houseHelpRepository.findByFilter(filter);
-    }
 }

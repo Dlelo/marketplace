@@ -1,12 +1,12 @@
 package com.example.marketplace.dto;
 
 import com.example.marketplace.enums.AvailabilityType;
+import com.example.marketplace.enums.HouseHelpStatus;
+import com.example.marketplace.enums.RequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -16,6 +16,8 @@ import java.time.LocalDate;
 public class HouseHelpFilterDTO {
 
     private Integer experience;
+
+    private HouseHelpStatus status;
 
     // Availability type (e.g., FULL_TIME, PART_TIME, LIVE_IN, LIVE_OUT)
     private AvailabilityType availability;

@@ -64,26 +64,6 @@ public class AuthController {
         }
     }
 
-//    @PostMapping("/login")
-//    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-//        try {
-//            if (loginRequest.getEmail() == null || loginRequest.getPassword() == null) {
-//                return ResponseEntity.badRequest().body("Email and password are required.");
-//            }
-//            Authentication authentication = authenticationManager.authenticate(
-//                    new UsernamePasswordAuthenticationToken(
-//                            loginRequest.getEmail(),
-//                            loginRequest.getPassword()
-//                    )
-//            );
-//            String token = jwtUtil.generateToken(authentication.getName());
-//            return ResponseEntity.ok(Collections.singletonMap("token", token));
-//        } catch (BadCredentialsException e) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
-//        }
-//    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
@@ -97,11 +77,6 @@ public class AuthController {
                             loginRequest.getPassword()
                     )
             );
-
-//            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-//            User user = userDetails.getUser();
-//
-//           String role = user.getRoles().toString();
 
             Object principal = authentication.getPrincipal();
             Long userId = null;
