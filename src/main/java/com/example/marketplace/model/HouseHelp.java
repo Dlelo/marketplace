@@ -1,14 +1,13 @@
 package com.example.marketplace.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
 
-@Entity
 @Data
+@Entity
 @Table(name = "house_help")
 public class HouseHelp {
     @Id
@@ -16,10 +15,9 @@ public class HouseHelp {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnoreProperties({"houseHelp"})
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonIgnoreProperties({"houseHelp", "homeOwner", "roles"})
     private User user;
-
 
     @Column(nullable = false)
     private boolean verified;

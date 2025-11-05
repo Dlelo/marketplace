@@ -10,6 +10,6 @@ public class UserResponseDTO {
     private String email;
     private String name;
     private Set<String> roles;
-    private String houseHelpName;
-    private String homeOwnerName;
+    private HouseHelpUpdateDTO houseHelp;
+    private HomeOwnerUpdateDTO homeOwner;
 }

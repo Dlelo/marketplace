@@ -1,7 +1,10 @@
 package com.example.marketplace.service;
 
+import com.example.marketplace.dto.HomeOwnerUpdateDTO;
+import com.example.marketplace.dto.HouseHelpUpdateDTO;
 import com.example.marketplace.dto.RegisterRequest;
 import com.example.marketplace.dto.UserResponseDTO;
+import com.example.marketplace.model.HomeOwner;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.model.Role;
 import com.example.marketplace.model.User;
@@ -115,7 +118,7 @@ public class UserService {
         return houseHelpRepository.save(houseHelp);
     }
     public UserResponseDTO getUserById(Long id) {
-        User user = userRepository.findById(id)
+        User user = userRepository.findByIdWithRelations(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
         return mapToUserResponseDTO(user);
     }
@@ -123,22 +126,41 @@ public class UserService {
     private UserResponseDTO mapToUserResponseDTO(User user) {
         UserResponseDTO dto = new UserResponseDTO();
         dto.setId(user.getId());
-        dto.setName(user.getName());
-        dto.setEmail(user.getEmail());
         dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+        dto.setName(user.getName());
         dto.setRoles(
                 user.getRoles().stream()
-                        .map(role -> role.getName())
+                        .map(Role::getName)
                         .collect(Collectors.toSet())
         );
 
-        if (user.getHouseHelp() != null) {
-            dto.setId(user.getHouseHelp().getId());
-        }
-
-        if (user.getHomeOwner() != null) {
-            dto.setId(user.getHomeOwner().getId());
-        }
+        dto.setHouseHelp(mapToHouseHelpDTO(user.getHouseHelp()));
+        dto.setHomeOwner(mapToHomeOwnerDTO(user.getHomeOwner()));
         return dto;
     }
+
+
+    private HouseHelpUpdateDTO mapToHouseHelpDTO(HouseHelp houseHelp) {
+        if (houseHelp == null) return null;
+
+        HouseHelpUpdateDTO dto = new HouseHelpUpdateDTO();
+        dto.setNationalId(houseHelp.getNationalId());
+        dto.setHomeLocation(houseHelp.getHomeLocation());
+        dto.setSkills(houseHelp.getSkills());
+        dto.setLanguages(houseHelp.getLanguages());
+        return dto;
+    }
+
+    private HomeOwnerUpdateDTO mapToHomeOwnerDTO(HomeOwner homeOwner) {
+        if (homeOwner == null) return null;
+
+        HomeOwnerUpdateDTO dto = new HomeOwnerUpdateDTO();
+        dto.setNationalId(homeOwner.getNationalId());
+        dto.setHomeLocation(homeOwner.getHomeLocation());
+        dto.setPhoneNumber(homeOwner.getPhoneNumber());
+        return dto;
+    }
+
+
 }

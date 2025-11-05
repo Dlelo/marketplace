@@ -1,7 +1,6 @@
 package com.example.marketplace.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,16 +33,15 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    @JsonManagedReference
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<Role> roles = new HashSet<>();
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnoreProperties({"user"})
     private HouseHelp houseHelp;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnoreProperties({"user"})
     private HomeOwner homeOwner;
 }
