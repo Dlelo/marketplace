@@ -6,6 +6,7 @@ import java.util.List;
 
 @Data
 public class HouseHelpUpdateDTO {
+    private Long id;
     private Integer numberOfChildren;
     private List<String> languages;
     private String levelOfEducation;

@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class HomeOwnerUpdateDTO {
+    private Long id;
     private String fullName;
     private String phoneNumber;
     private String email;

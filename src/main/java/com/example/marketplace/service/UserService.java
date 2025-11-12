@@ -160,11 +160,11 @@ public class UserService {
         return dto;
     }
 
-
     private HouseHelpUpdateDTO mapToHouseHelpDTO(HouseHelp houseHelp) {
         if (houseHelp == null) return null;
 
         HouseHelpUpdateDTO dto = new HouseHelpUpdateDTO();
+        dto.setId(houseHelp.getId());
         dto.setNationalId(houseHelp.getNationalId());
         dto.setHomeLocation(houseHelp.getHomeLocation());
         dto.setSkills(houseHelp.getSkills());
@@ -176,6 +176,7 @@ public class UserService {
         if (homeOwner == null) return null;
 
         HomeOwnerUpdateDTO dto = new HomeOwnerUpdateDTO();
+        dto.setId(homeOwner.getId());
         dto.setNationalId(homeOwner.getNationalId());
         dto.setHomeLocation(homeOwner.getHomeLocation());
         dto.setPhoneNumber(homeOwner.getPhoneNumber());
