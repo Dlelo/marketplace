@@ -1,9 +1,6 @@
 package com.example.marketplace.service;
 
-import com.example.marketplace.dto.HomeOwnerUpdateDTO;
-import com.example.marketplace.dto.HouseHelpUpdateDTO;
-import com.example.marketplace.dto.RegisterRequest;
-import com.example.marketplace.dto.UserResponseDTO;
+import com.example.marketplace.dto.*;
 import com.example.marketplace.model.HomeOwner;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.model.Role;
@@ -160,17 +157,27 @@ public class UserService {
         return dto;
     }
 
-    private HouseHelpUpdateDTO mapToHouseHelpDTO(HouseHelp houseHelp) {
+    private HouseHelpResponseDTO mapToHouseHelpDTO(HouseHelp houseHelp) {
         if (houseHelp == null) return null;
 
-        HouseHelpUpdateDTO dto = new HouseHelpUpdateDTO();
+        HouseHelpResponseDTO dto = new HouseHelpResponseDTO();
         dto.setId(houseHelp.getId());
-        dto.setNationalId(houseHelp.getNationalId());
-        dto.setHomeLocation(houseHelp.getHomeLocation());
-        dto.setSkills(houseHelp.getSkills());
+        dto.setNumberOfChildren(houseHelp.getNumberOfChildren());
         dto.setLanguages(houseHelp.getLanguages());
+        dto.setLevelOfEducation(houseHelp.getLevelOfEducation());
+        dto.setContactPersons(houseHelp.getContactPersons());
+        dto.setHomeLocation(houseHelp.getHomeLocation());
+        dto.setCurrentLocation(houseHelp.getCurrentLocation());
+        dto.setNationalId(houseHelp.getNationalId());
+        dto.setMedicalReport(houseHelp.getMedicalReport());
+        dto.setGoodConduct(houseHelp.getGoodConduct());
+        dto.setYearsOfExperience(houseHelp.getYearsOfExperience());
+        dto.setReligion(houseHelp.getReligion());
+        dto.setSkills(houseHelp.getSkills());
+
         return dto;
     }
+
 
     private HomeOwnerUpdateDTO mapToHomeOwnerDTO(HomeOwner homeOwner) {
         if (homeOwner == null) return null;

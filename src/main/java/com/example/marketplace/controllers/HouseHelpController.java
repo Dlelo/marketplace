@@ -39,6 +39,7 @@ public class HouseHelpController {
 
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('AGENT','ADMIN','HOUSEHELP')")
     public HouseHelpUpdateResponseDTO updateHouseHelp(@PathVariable Long id, @RequestBody HouseHelpUpdateDTO dto) {
         return houseHelpService.updateHouseHelp(id, dto);
     }

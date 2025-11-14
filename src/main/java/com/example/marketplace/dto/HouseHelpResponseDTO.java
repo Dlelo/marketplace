@@ -5,7 +5,8 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class HouseHelpUpdateDTO {
+public class HouseHelpResponseDTO {
+    private Long id;
     private Integer numberOfChildren;
     private List<String> languages;
     private String levelOfEducation;
