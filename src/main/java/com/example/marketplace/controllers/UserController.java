@@ -1,7 +1,8 @@
 package com.example.marketplace.controllers;
 
-import com.example.marketplace.dto.AddRoleToUserRequestDTO;
-import com.example.marketplace.dto.UserResponseDTO;
+import com.example.marketplace.dto.*;
+import com.example.marketplace.model.HouseHelp;
+import com.example.marketplace.model.User;
 import com.example.marketplace.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
@@ -20,7 +21,22 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PatchMapping("/user/roles")
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("")
+    public ResponseEntity<Page<UserResponseDTO>> listUsers(Pageable pageable) {
+        return ResponseEntity.ok(userService.getAllUsers(pageable));
+    }
+
+    @PostMapping("/search")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<Page<User>> searchUser(
+            @RequestBody UserFilterDTO filter,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(userService.findByFilterAndPage(filter, pageable));
+    }
+
+    @PatchMapping("/roles")
     public ResponseEntity<?> addRole(@RequestBody AddRoleToUserRequestDTO request) {
         try {
             UserResponseDTO updatedUser = userService.addRoleToUser(
@@ -33,14 +49,22 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/users")
-    public ResponseEntity<Page<UserResponseDTO>> listUsers(Pageable pageable) {
-        return ResponseEntity.ok(userService.getAllUsers(pageable));
+    @PatchMapping("/roles/edit")
+    public ResponseEntity<?> editUserRoles(@RequestBody EditUserRolesRequestDTO request) {
+        try {
+            UserResponseDTO updatedUser = userService.updateUserRoles(
+                    request.getUserId(),
+                    request.getRoles()
+            );
+            return ResponseEntity.ok(updatedUser);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
+
     @PreAuthorize("hasAnyRole('ADMIN', 'AGENT', 'HOUSEHELP', 'HOMEOWNER')")
-    @GetMapping("/user/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         try {
             UserResponseDTO user = userService.getUserById(id);

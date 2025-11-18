@@ -8,16 +8,17 @@ import com.example.marketplace.model.User;
 import com.example.marketplace.repository.HouseHelpRepository;
 import com.example.marketplace.repository.RoleRepository;
 import com.example.marketplace.repository.UserRepository;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.*;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -91,6 +92,32 @@ public class UserService {
         return toUserResponseDTO(updatedUser);
     }
 
+    public UserResponseDTO updateUserRoles(Long userId, List<String> roles) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Set<Role> requestedRoles = roles.stream()
+                .map(roleName ->
+                        roleRepository.findByName(roleName.toUpperCase())
+                                .orElseThrow(() -> new RuntimeException("Role not found: " + roleName))
+                )
+                .collect(Collectors.toSet());
+
+        boolean containsHouseHelp = requestedRoles.stream()
+                .anyMatch(r -> r.getName().equalsIgnoreCase("HOUSEHELP"));
+
+        boolean containsHomeOwner = requestedRoles.stream()
+                .anyMatch(r -> r.getName().equalsIgnoreCase("HOMEOWNER"));
+
+        if (containsHouseHelp && containsHomeOwner) {
+            requestedRoles.removeIf(r -> r.getName().equalsIgnoreCase("HOMEOWNER"));
+        }
+
+        user.setRoles(requestedRoles);
+        User savedUser = userRepository.save(user);
+
+        return mapToUserResponseDTO(savedUser);
+    }
 
 
     private UserResponseDTO toUserResponseDTO(User user) {
@@ -178,7 +205,6 @@ public class UserService {
         return dto;
     }
 
-
     private HomeOwnerUpdateDTO mapToHomeOwnerDTO(HomeOwner homeOwner) {
         if (homeOwner == null) return null;
 
@@ -190,5 +216,32 @@ public class UserService {
         return dto;
     }
 
+    public Page<User> findByFilterAndPage(UserFilterDTO filter, Pageable pageable) {
+        return userRepository.findAll(buildSpecification(filter), pageable);
+    }
+
+    private Specification<User> buildSpecification(UserFilterDTO filter) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (filter.getEmail() != null && !filter.getEmail().isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("email")), "%" + filter.getName().toLowerCase() + "%"));
+            }
+
+            if (filter.getName() != null && !filter.getName().isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("email")), "%" + filter.getName().toLowerCase() + "%"));
+            }
+
+            if (filter.getRoles() != null) {
+                predicates.add(cb.equal(root.get("roles"), filter.getRoles()));
+            }
+
+            if (filter.getId() != null) {
+                predicates.add(cb.equal(root.get("id"), filter.getId()));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
 
 }

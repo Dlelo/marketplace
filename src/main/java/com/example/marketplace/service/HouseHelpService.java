@@ -69,6 +69,7 @@ public class HouseHelpService {
     public Page<HouseHelp> findByFilterAndPage(HouseHelpFilterDTO filter, Pageable pageable) {
         return houseHelpRepository.findAll(buildSpecification(filter), pageable);
     }
+
     private Specification<HouseHelp> buildSpecification(HouseHelpFilterDTO filter) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
