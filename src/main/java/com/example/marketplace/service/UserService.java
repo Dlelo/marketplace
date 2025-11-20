@@ -72,16 +72,28 @@ public class UserService {
 
         Set<Role> existingRoles = user.getRoles();
 
-        // Exclusive logic for HOUSEHELP and HOMEOWNER
         boolean isHouseHelp = existingRoles.stream().anyMatch(r -> r.getName().equalsIgnoreCase("HOUSEHELP"));
         boolean isHomeOwner = existingRoles.stream().anyMatch(r -> r.getName().equalsIgnoreCase("HOMEOWNER"));
 
-        if (newRole.getName().equalsIgnoreCase("HOUSEHELP") && isHomeOwner) {
-            // Replace HOMEOWNER with HOUSEHELP
+        if (newRole.getName().equalsIgnoreCase("HOUSEHELP")) {
+
             existingRoles.removeIf(r -> r.getName().equalsIgnoreCase("HOMEOWNER"));
-        } else if (newRole.getName().equalsIgnoreCase("HOMEOWNER") && isHouseHelp) {
-            // Replace HOUSEHELP with HOMEOWNER
+
+            if (user.getHouseHelp() == null) {
+                HouseHelp houseHelp = new HouseHelp();
+                houseHelp.setUser(user);
+                houseHelp.setVerified(false);
+                houseHelpRepository.save(houseHelp);
+            }
+
+        } else if (newRole.getName().equalsIgnoreCase("HOMEOWNER")) {
+
             existingRoles.removeIf(r -> r.getName().equalsIgnoreCase("HOUSEHELP"));
+
+            if (user.getHouseHelp() != null) {
+                houseHelpRepository.delete(user.getHouseHelp());
+                user.setHouseHelp(null);
+            }
         }
 
         existingRoles.add(newRole);
@@ -103,14 +115,27 @@ public class UserService {
                 )
                 .collect(Collectors.toSet());
 
-        boolean containsHouseHelp = requestedRoles.stream()
+        boolean wantsHouseHelp = requestedRoles.stream()
                 .anyMatch(r -> r.getName().equalsIgnoreCase("HOUSEHELP"));
 
-        boolean containsHomeOwner = requestedRoles.stream()
+        boolean wantsHomeOwner = requestedRoles.stream()
                 .anyMatch(r -> r.getName().equalsIgnoreCase("HOMEOWNER"));
 
-        if (containsHouseHelp && containsHomeOwner) {
+        if (wantsHouseHelp && wantsHomeOwner) {
             requestedRoles.removeIf(r -> r.getName().equalsIgnoreCase("HOMEOWNER"));
+            wantsHomeOwner = false;
+        }
+
+        if (wantsHouseHelp && user.getHouseHelp() == null) {
+            HouseHelp houseHelp = new HouseHelp();
+            houseHelp.setUser(user);
+            houseHelp.setVerified(false);
+            houseHelpRepository.save(houseHelp);
+        }
+
+        if (!wantsHouseHelp && user.getHouseHelp() != null) {
+            houseHelpRepository.delete(user.getHouseHelp());
+            user.setHouseHelp(null);
         }
 
         user.setRoles(requestedRoles);
