@@ -1,4 +1,4 @@
-name: Build & Deploy Backend (GHCR)
+name: Deploy to Production
 
 on:
   push:
@@ -16,32 +16,57 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Build JAR (Gradle)
         run: |
           ./gradlew clean bootJar -x test
 
-      - name: Login to GHCR
-        env:
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
-        run: echo "${GHCR_TOKEN}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Login to GHCR (GitHub Actions)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/Dlelo/marketplace-backend:latest -t ghcr.io/Dlelo/marketplace-backend:${{ github.sha }} .
+          # Convert to lowercase
+          IMAGE_LOWER=$(echo "ghcr.io/Dlelo/marketplace-backend" | tr '[:upper:]' '[:lower:]')
+          docker build -t $IMAGE_LOWER:latest -t $IMAGE_LOWER:${{ github.sha }} .
 
       - name: Push to GHCR
         run: |
-          docker push ghcr.io/Dlelo/marketplace-backend:latest
-          docker push ghcr.io/Dlelo/marketplace-backend:${{ github.sha }}
+          IMAGE_LOWER=$(echo "ghcr.io/Dlelo/marketplace-backend" | tr '[:upper:]' '[:lower:]')
+          docker push $IMAGE_LOWER:latest
+          docker push $IMAGE_LOWER:${{ github.sha }}
 
-      - name: Deploy to server (pull & restart)
+      - name: Deploy to server
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
+          host: api.yayaconnectapp.com
+          username: root
+          key: ${{ secrets.DOSSH }}
+          port: 22
           script: |
-            cd ${{ secrets.DEPLOY_PATH }}
+            cd /opt/yaya-deploy
+            
+            # Login to GHCR on server
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u dlelo --password-stdin
+            
+            # Pull and restart backend only
+            echo "Pulling latest backend image..."
             docker compose pull backend
-            docker compose up -d --no-deps --build backend
-            docker compose restart nginx
+            
+            echo "Restarting backend..."
+            docker compose up -d --no-deps backend
+            
+            # Cleanup
+            echo "Cleaning up old images..."
+            docker image prune -f
+            
+            echo "✅ Backend deployment completed!"
