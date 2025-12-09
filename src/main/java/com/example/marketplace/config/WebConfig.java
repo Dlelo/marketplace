@@ -13,7 +13,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:4200", "https://www.yayaconnectapp.com", "https://yayaconnectapp.com") // Angular dev origin
+                        .allowedOrigins("http://localhost:4200") // Angular dev origin
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("Authorization", "Content-Type", "*")
                         .exposedHeaders("Authorization") // so browser can read it
