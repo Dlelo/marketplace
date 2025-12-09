@@ -33,8 +33,8 @@ public class UserService {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already exists");
         }
-        if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("Username already exists");
+        if (userRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()) {
+            throw new IllegalArgumentException("Phone number already exists");
         }
 
         String resolvedRoleName = (roleName == null || roleName.trim().isEmpty())
@@ -46,7 +46,7 @@ public class UserService {
 
         User user = new User();
         user.setEmail(dto.getEmail());
-        user.setUsername(dto.getUsername());
+        user.setPhoneNumber(dto.getPhoneNumber());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setName(dto.getName());
         user.setRoles(new HashSet<>(Collections.singletonList(role)));
@@ -148,7 +148,7 @@ public class UserService {
     private UserResponseDTO toUserResponseDTO(User user) {
         UserResponseDTO response = new UserResponseDTO();
         response.setId(user.getId());
-        response.setUsername(user.getUsername());
+        response.setPhoneNumber(user.getPhoneNumber());
         response.setEmail(user.getEmail());
         response.setName(user.getName());
         response.setRoles(user.getRoles().stream()
@@ -163,7 +163,7 @@ public class UserService {
                 .map(user -> {
                     UserResponseDTO dto = new UserResponseDTO();
                     dto.setId(user.getId());
-                    dto.setUsername(user.getUsername());
+                    dto.setPhoneNumber(user.getPhoneNumber());
                     dto.setEmail(user.getEmail());
                     dto.setName(user.getName());
                     dto.setRoles(user.getRoles()
@@ -195,7 +195,7 @@ public class UserService {
     private UserResponseDTO mapToUserResponseDTO(User user) {
         UserResponseDTO dto = new UserResponseDTO();
         dto.setId(user.getId());
-        dto.setUsername(user.getUsername());
+        dto.setPhoneNumber(user.getPhoneNumber());
         dto.setEmail(user.getEmail());
         dto.setName(user.getName());
         dto.setRoles(
