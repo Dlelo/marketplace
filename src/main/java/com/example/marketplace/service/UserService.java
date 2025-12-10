@@ -5,6 +5,7 @@ import com.example.marketplace.model.HomeOwner;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.model.Role;
 import com.example.marketplace.model.User;
+import com.example.marketplace.repository.HomeOwnerRepository;
 import com.example.marketplace.repository.HouseHelpRepository;
 import com.example.marketplace.repository.RoleRepository;
 import com.example.marketplace.repository.UserRepository;
@@ -27,6 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final HouseHelpRepository houseHelpRepository;
+    private final HomeOwnerRepository homeOwnerRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UserResponseDTO registerUser(RegisterRequest dto, String roleName) {
@@ -93,6 +95,16 @@ public class UserService {
             if (user.getHouseHelp() != null) {
                 houseHelpRepository.delete(user.getHouseHelp());
                 user.setHouseHelp(null);
+            }
+
+            if (user.getHomeOwner() == null) {
+                HomeOwner homeOwner = new HomeOwner();
+                homeOwner.setUser(user);
+                homeOwner.setNumberOfDependents(0);
+                homeOwner.setHouseType(null);
+                homeOwner.setNumberOfRooms(null);
+                homeOwner.setHomeLocation(null);
+                homeOwnerRepository.save(homeOwner);
             }
         }
 
