@@ -39,4 +39,6 @@ public class HouseHelp {
 
     @ElementCollection
     private List<String> skills;
+
+    private boolean active = true;
 }

@@ -274,6 +274,157 @@ public class UserService {
         return userRepository.findAll(buildSpecification(filter), pageable);
     }
 
+//    public UserResponseDTO updateUser(Long userId, UpdateUserRequest dto) {
+//
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+//
+//        // --- Email update + uniqueness check
+//        if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail())) {
+//            if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+//                throw new IllegalArgumentException("Email already exists");
+//            }
+//            user.setEmail(dto.getEmail());
+//        }
+//
+//        // --- Phone update + uniqueness check
+//        if (dto.getPhoneNumber() != null && !dto.getPhoneNumber().equals(user.getPhoneNumber())) {
+//            if (userRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()) {
+//                throw new IllegalArgumentException("Phone number already exists");
+//            }
+//            user.setPhoneNumber(dto.getPhoneNumber());
+//        }
+//
+//        // --- Update Name
+//        if (dto.getName() != null) {
+//            user.setName(dto.getName());
+//        }
+//
+//        // --- Handle Role Change (if provided)
+//        if (dto.getRole() != null && !dto.getRole().isBlank()) {
+//
+//            String roleName = dto.getRole().trim().toUpperCase();
+//
+//            Role role = roleRepository.findByName(roleName)
+//                    .orElseThrow(() -> new IllegalArgumentException("Role " + roleName + " does not exist"));
+//
+//            user.setRoles(Set.of(role));
+//
+//            // --- Auto-create related profile entities
+//            if (roleName.equals("HOMEOWNER")) {
+//
+//                if (!homeOwnerRepository.existsByUser(user)) {
+//                    HomeOwner homeowner = new HomeOwner();
+//                    homeowner.setUser(user);
+//                    homeOwnerRepository.save(homeowner);
+//                }
+//
+//                homeOwnerRepository.findByUserAndActiveTrue(user).ifPresent(homeOwner -> {
+//                    homeOwner.setActive(false);
+//                    homeOwnerRepository.save(homeOwner);
+//                });
+//
+//            } else if (roleName.equals("HOUSEHELP")) {
+//
+//                if (!houseHelpRepository.existsByUser(user)) {
+//                    HouseHelp househelp = new HouseHelp();
+//                    househelp.setUser(user);
+//                    househelp.setVerified(false);
+//                    houseHelpRepository.save(househelp);
+//                }
+//
+//                houseHelpRepository.findByUserAndActiveTrue(user).ifPresent(hh -> {
+//                    hh.setActive(false);
+//                    houseHelpRepository.save(hh);
+//                });
+//            }
+//        }
+//
+//        User saved = userRepository.save(user);
+//        return toUserResponseDTO(saved);
+//    }
+
+    public UserResponseDTO updateUser(Long userId, UpdateUserRequest dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // --- Update email with uniqueness check
+        if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail())) {
+            if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+                throw new IllegalArgumentException("Email already exists");
+            }
+            user.setEmail(dto.getEmail());
+        }
+
+        // --- Update phone with uniqueness check
+        if (dto.getPhoneNumber() != null && !dto.getPhoneNumber().equals(user.getPhoneNumber())) {
+            if (userRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()) {
+                throw new IllegalArgumentException("Phone number already exists");
+            }
+            user.setPhoneNumber(dto.getPhoneNumber());
+        }
+
+        // --- Update name
+        if (dto.getName() != null) {
+            user.setName(dto.getName());
+        }
+
+        // --- Handle role change
+        if (dto.getRole() != null && !dto.getRole().isBlank()) {
+            String roleName = dto.getRole().trim().toUpperCase();
+            Role role = roleRepository.findByName(roleName)
+                    .orElseThrow(() -> new IllegalArgumentException("Role " + roleName + " does not exist"));
+            user.setRoles(Set.of(role));
+
+            switch (roleName) {
+                case "HOMEOWNER" -> {
+                    // Deactivate old HouseHelp if exists
+                    houseHelpRepository.findByUserAndActiveTrue(user).ifPresent(hh -> {
+                        hh.setActive(false);
+                        houseHelpRepository.save(hh);
+                    });
+
+                    // Create or reactivate HomeOwner
+                    HomeOwner homeOwner = homeOwnerRepository.findByUser(user)
+                            .orElse(new HomeOwner());
+                    homeOwner.setUser(user);
+                    homeOwner.setActive(true);
+                    homeOwner.setNumberOfDependents(dto.getNumberOfDependents());
+                    homeOwner.setHouseType(dto.getHouseType());
+                    homeOwner.setNumberOfRooms(dto.getNumberOfRooms());
+                    homeOwner.setHomeLocation(dto.getHomeLocation());
+                    homeOwnerRepository.save(homeOwner);
+                }
+                case "HOUSEHELP" -> {
+                    // Deactivate old HomeOwner if exists
+                    homeOwnerRepository.findByUserAndActiveTrue(user).ifPresent(ho -> {
+                        ho.setActive(false);
+                        homeOwnerRepository.save(ho);
+                    });
+
+                    // Create or reactivate HouseHelp
+                    HouseHelp hh = houseHelpRepository.findByUser(user)
+                            .orElse(new HouseHelp());
+                    hh.setUser(user);
+                    hh.setActive(true);
+                    hh.setVerified(dto.getVerified() != null ? dto.getVerified() : false);
+                    hh.setYearsOfExperience(dto.getYearsOfExperience());
+                    if (dto.getSkills() != null) {
+                        hh.setSkills(Arrays.stream(dto.getSkills().split(","))
+                                .map(String::trim)
+                                .filter(s -> !s.isEmpty())
+                                .collect(Collectors.toList()));
+                    }
+                    houseHelpRepository.save(hh);
+                }
+            }
+        }
+
+        User savedUser = userRepository.save(user);
+        return toUserResponseDTO(savedUser);
+    }
+
+
     private Specification<User> buildSpecification(UserFilterDTO filter) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();

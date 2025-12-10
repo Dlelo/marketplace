@@ -64,6 +64,7 @@ public class UserController {
 
 
     @PreAuthorize("hasAnyRole('ADMIN', 'AGENT', 'HOUSEHELP', 'HOMEOWNER')")
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         try {
@@ -72,5 +73,14 @@ public class UserController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
+    }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserResponseDTO> updateUser(
+            @PathVariable Long userId,
+            @RequestBody UpdateUserRequest request) {
+
+        UserResponseDTO updatedUser = userService.updateUser(userId, request);
+        return ResponseEntity.ok(updatedUser);
     }
 }

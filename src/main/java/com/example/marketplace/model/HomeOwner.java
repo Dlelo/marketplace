@@ -38,4 +38,6 @@ public class HomeOwner {
 
     @OneToMany(mappedBy = "homeOwner", cascade = CascadeType.ALL)
     private List<HireRequest> hireRequests = new ArrayList<>();
+
+    private boolean active = true;
 }

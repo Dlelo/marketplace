@@ -23,4 +23,10 @@ public interface HouseHelpRepository extends JpaRepository<HouseHelp, Long>, Jpa
 
     // Optional: List<HouseHelp> findByVerifiedTrue();
 
+    Optional<HouseHelp> findByUserAndActiveTrue(User user);
+
+    boolean existsByUserAndActiveTrue(User user);
+
+    boolean existsByUser(User user);
+
 }

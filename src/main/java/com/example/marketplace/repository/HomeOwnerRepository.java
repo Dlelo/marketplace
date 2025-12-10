@@ -12,5 +12,11 @@ public interface HomeOwnerRepository extends JpaRepository<HomeOwner, Long> {
 
     Optional<HomeOwner> findByUser(User user);
 
+    Optional<HomeOwner> findByUserAndActiveTrue(User user);
+
+    boolean existsByUserAndActiveTrue(User user);
+
     Optional<HomeOwner> findByUser_Email(String email);
+
+    boolean existsByUser(User user);
 }
