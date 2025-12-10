@@ -32,6 +32,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public UserResponseDTO registerUser(RegisterRequest dto, String roleName) {
+
+        // Check duplicates
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already exists");
         }
@@ -39,13 +41,18 @@ public class UserService {
             throw new IllegalArgumentException("Phone number already exists");
         }
 
+        // Default role = HOMEOWNER
         String resolvedRoleName = (roleName == null || roleName.trim().isEmpty())
                 ? "HOMEOWNER"
                 : roleName.trim().toUpperCase();
 
+        // Load role
         Role role = roleRepository.findByName(resolvedRoleName)
-                .orElseThrow(() -> new IllegalArgumentException("Role " + resolvedRoleName + " does not exist. Please create it first."));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Role " + resolvedRoleName + " does not exist. Please create it first."
+                ));
 
+        // Create user
         User user = new User();
         user.setEmail(dto.getEmail());
         user.setPhoneNumber(dto.getPhoneNumber());
@@ -55,11 +62,21 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
-        if (resolvedRoleName.equalsIgnoreCase("HOUSEHELP")) {
-            HouseHelp houseHelp = new HouseHelp();
-            houseHelp.setUser(savedUser);
-            houseHelp.setVerified(false);
-            houseHelpRepository.save(houseHelp);
+        // Create default records for role
+        switch (resolvedRoleName) {
+            case "HOUSEHELP" -> {
+                HouseHelp houseHelp = new HouseHelp();
+                houseHelp.setUser(savedUser);
+                houseHelp.setVerified(false);
+                houseHelpRepository.save(houseHelp);
+            }
+            case "HOMEOWNER" -> {
+                HomeOwner homeOwner = new HomeOwner();
+                homeOwner.setUser(savedUser);
+                homeOwnerRepository.save(homeOwner);
+            }
+            default -> {
+            }
         }
 
         return toUserResponseDTO(savedUser);
