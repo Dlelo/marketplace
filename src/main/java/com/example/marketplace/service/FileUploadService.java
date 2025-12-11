@@ -1,6 +1,7 @@
 package com.example.marketplace.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -16,21 +17,30 @@ public class FileUploadService {
 
     private final S3Client s3Client;
 
-    private final String bucket = "yaya-docs";
+    @Value("${spaces.bucket}")
+    private String bucket;
 
-    public String upload(MultipartFile file) throws IOException {
+    @Value("${spaces.endpoint}")   // e.g. https://yaya-docs.fra1.digitaloceanspaces.com
+    private String endpoint;
 
-        String key = "documents/" + UUID.randomUUID() + "-" + file.getOriginalFilename();
+    public String upload(MultipartFile file) {
+        try {
+            String key = "documents/" + UUID.randomUUID() + "-" + file.getOriginalFilename();
 
-        s3Client.putObject(
-                PutObjectRequest.builder()
-                        .bucket(bucket)
-                        .key(key)
-                        .contentType(file.getContentType())
-                        .build(),
-                RequestBody.fromBytes(file.getBytes())
-        );
+            s3Client.putObject(
+                    PutObjectRequest.builder()
+                            .bucket(bucket)
+                            .key(key)
+                            .contentType(file.getContentType())
+                            .acl("public-read")
+                            .build(),
+                    RequestBody.fromBytes(file.getBytes())
+            );
 
-        return "https://" + bucket + ".fra1.digitaloceanspaces.com/" + key;
+            return endpoint + "/" + key;
+
+        } catch (IOException e) {
+            throw new RuntimeException("File upload failed", e);
+        }
     }
 }
