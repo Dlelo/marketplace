@@ -13,8 +13,8 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
 
-      SPACES_ACCESS_KEY: ${SPACES_ACCESS_KEY:-default_key_here}
-      SPACES_SECRET_KEY: ${SPACES_SECRET_KEY:-default_secret_here}
+      SPACES_ACCESS_KEY: ${SPACES_ACCESS_KEY:}
+      SPACES_SECRET_KEY: ${SPACES_SECRET_KEY:}
       DO_SPACES_ENDPOINT: https://fra1.digitaloceanspaces.com
       DO_SPACES_BUCKET: yaya-docs
       DO_SPACES_REGION: us-east-1
