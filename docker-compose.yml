@@ -12,6 +12,12 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/marketplace?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+
+      SPACES_ACCESS_KEY: ${SPACES_ACCESS_KEY:-default_key_here}
+      SPACES_SECRET_KEY: ${SPACES_SECRET_KEY:-default_secret_here}
+      DO_SPACES_ENDPOINT: https://fra1.digitaloceanspaces.com
+      DO_SPACES_BUCKET: yaya-docs
+      DO_SPACES_REGION: us-east-1
     restart: unless-stopped
 
   db:

@@ -17,10 +17,10 @@ public class FileUploadService {
 
     private final S3Client s3Client;
 
-    @Value("${spaces.bucket}")
+    @Value("${do.spaces.bucket}")
     private String bucket;
 
-    @Value("${spaces.endpoint}")   // e.g. https://yaya-docs.fra1.digitaloceanspaces.com
+    @Value("${do.spaces.endpoint}")   // e.g. https://yaya-docs.fra1.digitaloceanspaces.com
     private String endpoint;
 
     public String upload(MultipartFile file) {
