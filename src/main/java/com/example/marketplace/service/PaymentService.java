@@ -1,16 +1,25 @@
 package com.example.marketplace.service;
 
+import com.example.marketplace.dto.MpesaCallbackRequest;
+import com.example.marketplace.dto.PaymentResponseDTO;
+import com.example.marketplace.dto.UserResponseDTO;
 import com.example.marketplace.enums.PaymentStatus;
 import com.example.marketplace.model.Payment;
+import com.example.marketplace.model.Role;
 import com.example.marketplace.model.User;
 import com.example.marketplace.repository.PaymentRepository;
 import com.example.marketplace.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +47,7 @@ public class PaymentService {
                 .user(user)
                 .transactionId(response.get("CheckoutRequestID").toString())
                 .amount(amount)
+                .provider("M-PESA")
                 .status(PaymentStatus.PENDING)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -95,5 +105,21 @@ public class PaymentService {
 
     public Optional<Payment> findLatestSuccessfulPayment(String email) {
         return paymentRepository.findFirstByUser_EmailAndStatusOrderByCreatedAtDesc(email, PaymentStatus.SUCCESS);
+    }
+
+    public Page<PaymentResponseDTO> getAllPayments(Pageable pageable) {
+        return paymentRepository.findAll(pageable)
+                .map(payment -> {
+                    PaymentResponseDTO dto = new PaymentResponseDTO();
+                    dto.setId(payment.getId());
+                    dto.setTransactionId(payment.getTransactionId());
+                    dto.setAmount(payment.getAmount());
+                    dto.setProvider(payment.getProvider());
+                    dto.setStatus(payment.getStatus());
+                    dto.setCreatedAt(payment.getCreatedAt());
+                    dto.setUserId(payment.getUser().getId());
+                    dto.setUserEmail(payment.getUser().getEmail());
+                    return dto;
+                });
     }
 }
