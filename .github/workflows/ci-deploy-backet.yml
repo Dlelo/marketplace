@@ -23,6 +23,9 @@ jobs:
           java-version: '17'
 
       - name: Build JAR (Gradle)
+        env:
+          SPACES_ACCESS_KEY: ${{ secrets.SPACES_ACCESS_KEY }}
+          SPACES_SECRET_KEY: ${{ secrets.SPACES_SECRET_KEY }}
         run: |
           ./gradlew clean bootJar -x test
 
