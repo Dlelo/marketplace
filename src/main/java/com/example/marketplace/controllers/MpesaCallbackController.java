@@ -30,7 +30,7 @@ public class MpesaCallbackController {
         String checkoutRequestId = (String) callback.get("CheckoutRequestID");
         int resultCode = (Integer) callback.get("ResultCode");
 
-        Payment payment = paymentRepository.findByTransactionId(checkoutRequestId)
+        Payment payment = paymentRepository.findFirstByTransactionId(checkoutRequestId)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 
         if (resultCode == 0) {

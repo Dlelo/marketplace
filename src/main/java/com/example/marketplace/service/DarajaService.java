@@ -34,6 +34,9 @@ public class DarajaService {
     @Value("${daraja.passkey}")
     private String passkey;
 
+    @Value("${daraja.callback-url}")
+    private String callbackUrl;
+
     /**
      * Generate OAuth token
      */
@@ -96,7 +99,7 @@ public class DarajaService {
         request.put("PartyA", phoneNumber);
         request.put("PartyB", businessShortCode);
         request.put("PhoneNumber", phoneNumber);
-        request.put("CallBackURL", "https://your-domain.com/api/payments/webhook/mpesa");
+        request.put("CallBackURL", callbackUrl);
         request.put("AccountReference", accountReference);
         request.put("TransactionDesc", transactionDesc);
 

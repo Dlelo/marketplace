@@ -72,6 +72,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/househelp/**").authenticated()
                         .requestMatchers("/api/hire-requests/**").authenticated()
                         .requestMatchers("/api/interviews/**").authenticated()
+                        .requestMatchers("/mpesa/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 )

@@ -36,6 +36,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findByFilterAndPage(filter, pageable));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'AGENT',)")
     @PatchMapping("/roles")
     public ResponseEntity<?> addRole(@RequestBody AddRoleToUserRequestDTO request) {
         try {
@@ -61,7 +62,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-
 
     @PreAuthorize("hasAnyRole('ADMIN', 'AGENT', 'HOUSEHELP', 'HOMEOWNER')")
 
