@@ -3,6 +3,9 @@ package com.example.marketplace.controllers;
 import com.example.marketplace.dto.HomeOwnerUpdateDTO;
 import com.example.marketplace.dto.HomeOwnerUpdateResponseDTO;
 import com.example.marketplace.model.HomeOwner;
+import com.example.marketplace.model.HouseHelp;
+import com.example.marketplace.repository.HomeOwnerRepository;
+import com.example.marketplace.service.FileUploadService;
 import com.example.marketplace.service.HomeOwnerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -10,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/homeowner")
@@ -17,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 public class HomeOwnerController {
 
     private final HomeOwnerService homeOwnerService;
+    private final HomeOwnerRepository homeOwnerRepository;
+    private final FileUploadService fileUploadService;
 
     @GetMapping
     public ResponseEntity<Page<HomeOwner>> getAllHomeOwners(Pageable pageable) {
@@ -36,5 +42,21 @@ public class HomeOwnerController {
             @RequestBody HomeOwnerUpdateDTO dto
     ) {
         return ResponseEntity.ok(homeOwnerService.updateHomeOwner(id, dto));
+    }
+
+    @PostMapping("/{id}/upload-national-id")
+    public ResponseEntity<?> uploadNationalId(
+            @PathVariable Long id,
+            @RequestPart("file") MultipartFile file) {
+
+        HomeOwner homeOwner = homeOwnerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("HomeOwner not found"));
+
+        String url = fileUploadService.upload(file);
+
+        homeOwner.setNationalIdDocument(url);
+        homeOwnerRepository.save(homeOwner);
+
+        return ResponseEntity.ok(url);
     }
 }
