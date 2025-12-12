@@ -14,5 +14,5 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Optional<Payment> findFirstByUser_EmailAndStatusOrderByCreatedAtDesc(String email, PaymentStatus status);
 
     // 🔹 Needed for Daraja callback processing
-    Optional<Payment> findByTransactionId(String transactionId);
+    Optional<Payment> findFirstByTransactionId(String transactionId);
 }
