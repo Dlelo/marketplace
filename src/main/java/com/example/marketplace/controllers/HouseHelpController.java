@@ -5,6 +5,8 @@ import com.example.marketplace.dto.HouseHelpUpdateDTO;
 import com.example.marketplace.dto.HouseHelpUpdateResponseDTO;
 import com.example.marketplace.dto.HouseHelpVerificationResponseDTO;
 import com.example.marketplace.model.HouseHelp;
+import com.example.marketplace.repository.HouseHelpRepository;
+import com.example.marketplace.service.FileUploadService;
 import com.example.marketplace.service.HouseHelpService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,6 +23,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HouseHelpController {
     private final HouseHelpService houseHelpService;
+    private final HouseHelpRepository houseHelpRepository;
+    private final FileUploadService fileUploadService;
 
     @PostMapping("/search")
     @PreAuthorize("hasAnyRole('AGENT','HOMEOWNER','ADMIN')")
@@ -42,5 +47,21 @@ public class HouseHelpController {
     @PreAuthorize("hasAnyRole('AGENT','ADMIN','HOUSEHELP')")
     public HouseHelpUpdateResponseDTO updateHouseHelp(@PathVariable Long id, @RequestBody HouseHelpUpdateDTO dto) {
         return houseHelpService.updateHouseHelp(id, dto);
+    }
+
+    @PostMapping("/{id}/upload-national-id")
+    public ResponseEntity<?> uploadNationalId(
+            @PathVariable Long id,
+            @RequestPart("file") MultipartFile file) {
+
+        HouseHelp houseHelp = houseHelpRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
+
+        String url = fileUploadService.upload(file);
+
+        houseHelp.setNationalIdDocument(url);
+        houseHelpRepository.save(houseHelp);
+
+        return ResponseEntity.ok(url);
     }
 }

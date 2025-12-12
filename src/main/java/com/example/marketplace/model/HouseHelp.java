@@ -32,6 +32,7 @@ public class HouseHelp {
     private String homeLocation;
     private String currentLocation;
     private String nationalId;
+    private String nationalIdDocument;
     private String medicalReport;
     private String goodConduct;
     private Integer yearsOfExperience;
