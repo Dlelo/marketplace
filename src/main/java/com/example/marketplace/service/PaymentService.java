@@ -1,9 +1,10 @@
 package com.example.marketplace.service;
 
-import com.example.marketplace.dto.MpesaCallbackRequest;
+//import com.example.marketplace.dto.MpesaCallbackRequest;
 import com.example.marketplace.dto.PaymentResponseDTO;
 import com.example.marketplace.dto.UserResponseDTO;
 import com.example.marketplace.enums.PaymentStatus;
+import com.example.marketplace.model.Agent;
 import com.example.marketplace.model.Payment;
 import com.example.marketplace.model.Role;
 import com.example.marketplace.model.User;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -69,7 +71,7 @@ public class PaymentService {
         int resultCode = (Integer) stkCallback.get("ResultCode");
         String resultDesc = (String) stkCallback.get("ResultDesc");
 
-        Payment payment = paymentRepository.findByTransactionId(checkoutRequestId)
+        Payment payment = paymentRepository.findFirstByTransactionId(checkoutRequestId)
                 .orElseThrow(() -> new RuntimeException("Payment not found for CheckoutRequestID: " + checkoutRequestId));
 
         if (resultCode == 0) {
@@ -122,4 +124,17 @@ public class PaymentService {
                     return dto;
                 });
     }
+
+    public PaymentResponseDTO findByTransactionId(String transactionId){
+        Payment payment =  paymentRepository.findFirstByTransactionId(transactionId)
+                .orElseThrow(() -> new RuntimeException("Payment not found with transactionId: " + transactionId));
+        PaymentResponseDTO paymentDto = new PaymentResponseDTO();
+        paymentDto.setId(payment.getId());
+        paymentDto.setTransactionId(payment.getTransactionId());
+        paymentDto.setStatus(payment.getStatus());
+//        paymentDto.setUserEmail(payment.getUserEmail());
+
+        return paymentDto;
+    }
+
 }
