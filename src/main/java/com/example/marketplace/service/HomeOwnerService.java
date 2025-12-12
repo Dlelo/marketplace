@@ -33,7 +33,7 @@ public class HomeOwnerService {
         if (dto.getHomeLocation() != null) homeOwner.setHomeLocation(dto.getHomeLocation());
         if (dto.getHouseType() != null) homeOwner.setHouseType(dto.getHouseType());
         if (dto.getNumberOfDependents() != null) homeOwner.setNumberOfDependents(dto.getNumberOfDependents());
-        if (dto.getIdDocument() != null) homeOwner.setIdDocument(dto.getIdDocument());
+        if (dto.getIdDocument() != null) homeOwner.setNationalIdDocument(dto.getIdDocument());
         if (dto.getNumberOfRooms() != null) homeOwner.setNumberOfRooms(dto.getNumberOfRooms());
 
         HomeOwner updated = homeOwnerRepository.save(homeOwner);
@@ -67,7 +67,7 @@ public class HomeOwnerService {
         if (isBlank(homeOwner.getHomeLocation())) missing.add("homeLocation");
         if (isBlank(homeOwner.getHouseType())) missing.add("houseType");
         if (homeOwner.getNumberOfDependents() == null) missing.add("numberOfDependents");
-        if (isBlank(homeOwner.getIdDocument())) missing.add("idDocument");
+        if (isBlank(homeOwner.getNationalIdDocument())) missing.add("idDocument");
         if (isBlank(homeOwner.getNumberOfRooms())) missing.add("numberOfRooms");
 
         return missing;
