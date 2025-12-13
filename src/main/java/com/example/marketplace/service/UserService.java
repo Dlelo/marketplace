@@ -332,7 +332,6 @@ public class UserService {
             user.setName(dto.getName());
         }
 
-        // --- Handle role change
         if (dto.getRole() != null && !dto.getRole().isBlank()) {
             String roleName = dto.getRole().trim().toUpperCase();
             Role role = roleRepository.findByName(roleName)
@@ -347,7 +346,6 @@ public class UserService {
                         houseHelpRepository.save(hh);
                     });
 
-                    // Create or reactivate HomeOwner
                     HomeOwner homeOwner = homeOwnerRepository.findByUser(user)
                             .orElse(new HomeOwner());
                     homeOwner.setUser(user);
@@ -356,29 +354,30 @@ public class UserService {
                     homeOwner.setHouseType(dto.getHouseType());
                     homeOwner.setNumberOfRooms(dto.getNumberOfRooms());
                     homeOwner.setHomeLocation(dto.getHomeLocation());
+
+                    user.setHomeOwner(homeOwner);
                     homeOwnerRepository.save(homeOwner);
                 }
                 case "HOUSEHELP" -> {
-                    // Deactivate old HomeOwner if exists
                     homeOwnerRepository.findByUserAndActiveTrue(user).ifPresent(ho -> {
                         ho.setActive(false);
                         homeOwnerRepository.save(ho);
                     });
 
-                    // Create or reactivate HouseHelp
-                    HouseHelp hh = houseHelpRepository.findByUser(user)
+                    HouseHelp houseHelp = houseHelpRepository.findByUser(user)
                             .orElse(new HouseHelp());
-                    hh.setUser(user);
-                    hh.setActive(true);
-                    hh.setVerified(dto.getVerified() != null ? dto.getVerified() : false);
-                    hh.setYearsOfExperience(dto.getYearsOfExperience());
+                    houseHelp.setUser(user);
+                    houseHelp.setActive(true);
+                    houseHelp.setVerified(dto.getVerified() != null ? dto.getVerified() : false);
+                    houseHelp.setYearsOfExperience(dto.getYearsOfExperience());
                     if (dto.getSkills() != null) {
-                        hh.setSkills(Arrays.stream(dto.getSkills().split(","))
+                        houseHelp.setSkills(Arrays.stream(dto.getSkills().split(","))
                                 .map(String::trim)
                                 .filter(s -> !s.isEmpty())
                                 .collect(Collectors.toList()));
                     }
-                    houseHelpRepository.save(hh);
+                    user.setHouseHelp(houseHelp);
+                    houseHelpRepository.save(houseHelp);
                 }
             }
         }
