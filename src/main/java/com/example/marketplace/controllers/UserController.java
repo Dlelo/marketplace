@@ -36,7 +36,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findByFilterAndPage(filter, pageable));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'AGENT',)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'AGENT')")
     @PatchMapping("/roles")
     public ResponseEntity<?> addRole(@RequestBody AddRoleToUserRequestDTO request) {
         try {

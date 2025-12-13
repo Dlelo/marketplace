@@ -19,6 +19,7 @@ import java.util.*;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.stream.Collectors;
 
@@ -133,38 +134,66 @@ public class UserService {
         return toUserResponseDTO(updatedUser);
     }
 
+    @Transactional
     public UserResponseDTO updateUserRoles(Long userId, List<String> roles) {
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Set<Role> requestedRoles = roles.stream()
-                .map(roleName ->
-                        roleRepository.findByName(roleName.toUpperCase())
-                                .orElseThrow(() -> new RuntimeException("Role not found: " + roleName))
-                )
+                .map(r -> roleRepository.findByName("ROLE_" + r.toUpperCase())
+                        .orElseThrow(() -> new RuntimeException("Role not found: " + r)))
                 .collect(Collectors.toSet());
 
-        boolean wantsHouseHelp = requestedRoles.stream()
-                .anyMatch(r -> r.getName().equalsIgnoreCase("HOUSEHELP"));
+        boolean wantsHouseHelp = hasRole(requestedRoles, "HOUSEHELP");
+        boolean wantsHomeOwner = hasRole(requestedRoles, "HOMEOWNER");
 
-        boolean wantsHomeOwner = requestedRoles.stream()
-                .anyMatch(r -> r.getName().equalsIgnoreCase("HOMEOWNER"));
 
         if (wantsHouseHelp && wantsHomeOwner) {
-            requestedRoles.removeIf(r -> r.getName().equalsIgnoreCase("HOMEOWNER"));
-            wantsHomeOwner = false;
+            throw new RuntimeException("User cannot be HOUSEHELP and HOMEOWNER at the same time");
         }
 
-        if (wantsHouseHelp && user.getHouseHelp() == null) {
-            HouseHelp houseHelp = new HouseHelp();
-            houseHelp.setUser(user);
-            houseHelp.setVerified(false);
-            houseHelpRepository.save(houseHelp);
+        // =========================
+        // HOMEOWNER → HOUSEHELP
+        // =========================
+        if (wantsHouseHelp) {
+
+            // deactivate homeowner
+            if (user.getHomeOwner() != null && user.getHomeOwner().isActive()) {
+                user.getHomeOwner().setActive(false);
+            }
+
+            // activate or create househelp
+            if (user.getHouseHelp() == null) {
+                HouseHelp houseHelp = new HouseHelp();
+                houseHelp.setUser(user);
+                houseHelp.setVerified(false);
+                houseHelp.setActive(true);
+                houseHelpRepository.save(houseHelp);
+            } else {
+                user.getHouseHelp().setActive(true);
+            }
         }
 
-        if (!wantsHouseHelp && user.getHouseHelp() != null) {
-            houseHelpRepository.delete(user.getHouseHelp());
-            user.setHouseHelp(null);
+        // =========================
+        // HOUSEHELP → HOMEOWNER
+        // =========================
+        if (wantsHomeOwner) {
+
+            // deactivate househelp
+            if (user.getHouseHelp() != null && user.getHouseHelp().isActive()) {
+                user.getHouseHelp().setActive(false);
+            }
+
+            // activate or create homeowner
+            if (user.getHomeOwner() == null) {
+                HomeOwner homeOwner = new HomeOwner();
+                homeOwner.setUser(user);
+                homeOwner.setActive(true);
+                homeOwnerRepository.save(homeOwner);
+            } else {
+                user.getHomeOwner().setActive(true);
+            }
         }
 
         user.setRoles(requestedRoles);
@@ -173,6 +202,10 @@ public class UserService {
         return mapToUserResponseDTO(savedUser);
     }
 
+    private boolean hasRole(Set<Role> roles, String role) {
+        return roles.stream()
+                .anyMatch(r -> r.getName().equalsIgnoreCase(role));
+    }
 
     private UserResponseDTO toUserResponseDTO(User user) {
         UserResponseDTO response = new UserResponseDTO();
@@ -273,76 +306,6 @@ public class UserService {
     public Page<User> findByFilterAndPage(UserFilterDTO filter, Pageable pageable) {
         return userRepository.findAll(buildSpecification(filter), pageable);
     }
-
-//    public UserResponseDTO updateUser(Long userId, UpdateUserRequest dto) {
-//
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-//
-//        // --- Email update + uniqueness check
-//        if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail())) {
-//            if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-//                throw new IllegalArgumentException("Email already exists");
-//            }
-//            user.setEmail(dto.getEmail());
-//        }
-//
-//        // --- Phone update + uniqueness check
-//        if (dto.getPhoneNumber() != null && !dto.getPhoneNumber().equals(user.getPhoneNumber())) {
-//            if (userRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()) {
-//                throw new IllegalArgumentException("Phone number already exists");
-//            }
-//            user.setPhoneNumber(dto.getPhoneNumber());
-//        }
-//
-//        // --- Update Name
-//        if (dto.getName() != null) {
-//            user.setName(dto.getName());
-//        }
-//
-//        // --- Handle Role Change (if provided)
-//        if (dto.getRole() != null && !dto.getRole().isBlank()) {
-//
-//            String roleName = dto.getRole().trim().toUpperCase();
-//
-//            Role role = roleRepository.findByName(roleName)
-//                    .orElseThrow(() -> new IllegalArgumentException("Role " + roleName + " does not exist"));
-//
-//            user.setRoles(Set.of(role));
-//
-//            // --- Auto-create related profile entities
-//            if (roleName.equals("HOMEOWNER")) {
-//
-//                if (!homeOwnerRepository.existsByUser(user)) {
-//                    HomeOwner homeowner = new HomeOwner();
-//                    homeowner.setUser(user);
-//                    homeOwnerRepository.save(homeowner);
-//                }
-//
-//                homeOwnerRepository.findByUserAndActiveTrue(user).ifPresent(homeOwner -> {
-//                    homeOwner.setActive(false);
-//                    homeOwnerRepository.save(homeOwner);
-//                });
-//
-//            } else if (roleName.equals("HOUSEHELP")) {
-//
-//                if (!houseHelpRepository.existsByUser(user)) {
-//                    HouseHelp househelp = new HouseHelp();
-//                    househelp.setUser(user);
-//                    househelp.setVerified(false);
-//                    houseHelpRepository.save(househelp);
-//                }
-//
-//                houseHelpRepository.findByUserAndActiveTrue(user).ifPresent(hh -> {
-//                    hh.setActive(false);
-//                    houseHelpRepository.save(hh);
-//                });
-//            }
-//        }
-//
-//        User saved = userRepository.save(user);
-//        return toUserResponseDTO(saved);
-//    }
 
     public UserResponseDTO updateUser(Long userId, UpdateUserRequest dto) {
         User user = userRepository.findById(userId)
