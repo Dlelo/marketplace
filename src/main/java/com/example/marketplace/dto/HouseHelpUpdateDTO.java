@@ -18,4 +18,5 @@ public class HouseHelpUpdateDTO {
     private Integer yearsOfExperience;
     private String religion;
     private List<String> skills;
+    private String nationalIdDocument;
 }
