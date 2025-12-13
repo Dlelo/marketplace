@@ -36,7 +36,6 @@ public class HouseHelpController {
     }
 
     @PutMapping("/verify/{id}")
-    @PostMapping("/househelp/{houseHelpId}/verify")
     @PreAuthorize("hasAnyRole('AGENT','ADMIN')")
     public ResponseEntity<HouseHelpVerificationResponseDTO> verifyHouseHelp(@PathVariable Long houseHelpId) {
         return ResponseEntity.ok(houseHelpService.verifyHouseHelp(houseHelpId));
