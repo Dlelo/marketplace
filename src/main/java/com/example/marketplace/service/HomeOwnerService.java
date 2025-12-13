@@ -4,6 +4,7 @@ import com.example.marketplace.dto.HomeOwnerUpdateDTO;
 import com.example.marketplace.dto.HomeOwnerUpdateResponseDTO;
 import com.example.marketplace.model.HomeOwner;
 
+import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.repository.HomeOwnerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -75,5 +76,10 @@ public class HomeOwnerService {
 
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
+    }
+
+    public HomeOwner getHomeOwnerById(Long id) {
+        return homeOwnerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Homeowner not found with id: " + id));
     }
 }

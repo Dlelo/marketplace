@@ -59,4 +59,11 @@ public class HomeOwnerController {
 
         return ResponseEntity.ok(url);
     }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('AGENT','HOMEOWNER','ADMIN','HOUSEHELP')")
+    public ResponseEntity<HomeOwner> getHomeOwnerById(@PathVariable Long id) {
+        HomeOwner homeOwner = homeOwnerService.getHomeOwnerById(id);
+        return ResponseEntity.ok(homeOwner);
+    }
 }
