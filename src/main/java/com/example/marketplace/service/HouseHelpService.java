@@ -113,4 +113,9 @@ public class HouseHelpService {
         return value == null || value.trim().isEmpty();
     }
 
+    public HouseHelp getHouseHelpById(Long id) {
+        return houseHelpRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("HouseHelp not found with id: " + id));
+    }
+
 }
