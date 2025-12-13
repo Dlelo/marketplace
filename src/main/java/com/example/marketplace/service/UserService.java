@@ -141,7 +141,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Set<Role> requestedRoles = roles.stream()
-                .map(r -> roleRepository.findByName("ROLE_" + r.toUpperCase())
+                .map(r -> roleRepository.findByName(r.toUpperCase())
                         .orElseThrow(() -> new RuntimeException("Role not found: " + r)))
                 .collect(Collectors.toSet());
 
