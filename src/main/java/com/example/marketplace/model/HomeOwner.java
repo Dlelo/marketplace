@@ -1,6 +1,7 @@
 package com.example.marketplace.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -11,6 +12,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "home_owners")
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class HomeOwner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
