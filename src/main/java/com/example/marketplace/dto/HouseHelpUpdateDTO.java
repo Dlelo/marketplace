@@ -10,6 +10,7 @@ public class HouseHelpUpdateDTO {
     private List<String> languages;
     private String levelOfEducation;
     private String contactPersons;
+    private String contactPersonsPhoneNumber;
     private String homeLocation;
     private String currentLocation;
     private String nationalId;
