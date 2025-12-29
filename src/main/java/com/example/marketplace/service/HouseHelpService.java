@@ -42,6 +42,11 @@ public class HouseHelpService {
         if (dto.getYearsOfExperience() != null) houseHelp.setYearsOfExperience(dto.getYearsOfExperience());
         if (dto.getReligion() != null) houseHelp.setReligion(dto.getReligion());
         if (dto.getSkills() != null) houseHelp.setSkills(dto.getSkills());
+        if (dto.getHeight() != null) houseHelp.setHeight(dto.getHeight());
+        if (dto.getWeight() != null) houseHelp.setWeight(dto.getWeight());
+        if (dto.getAge() != null) houseHelp.setAge(dto.getAge());
+        if (dto.getGender() != null) houseHelp.setGender(dto.getGender());
+        if(dto.getContactPersonsPhoneNumber()!=null) houseHelp.setContactPersonsPhoneNumber(dto.getContactPersonsPhoneNumber());
 
         HouseHelp updated = houseHelpRepository.save(houseHelp);
 

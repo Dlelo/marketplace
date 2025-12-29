@@ -20,4 +20,9 @@ public class HouseHelpUpdateDTO {
     private String religion;
     private List<String> skills;
     private String nationalIdDocument;
+    private String height;
+    private String weight;
+    private String age;
+    private String gender;
+    private String localAuthorityVerificationDocument;
 }

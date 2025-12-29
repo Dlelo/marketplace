@@ -40,6 +40,11 @@ public class HouseHelp {
     private String goodConduct;
     private Integer yearsOfExperience;
     private String religion;
+    private String height;
+    private String weight;
+    private String age;
+    private String gender;
+    private String localAuthorityVerificationDocument;
     @ElementCollection
     private List<String> skills;
 
