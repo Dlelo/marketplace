@@ -17,6 +17,8 @@ public class HouseHelpFilterDTO {
 
     private Integer experience;
 
+    private Boolean active;
+
     private HouseHelpStatus status;
 
     // Availability type (e.g., FULL_TIME, PART_TIME, LIVE_IN, LIVE_OUT)

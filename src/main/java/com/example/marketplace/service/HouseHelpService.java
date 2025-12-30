@@ -91,6 +91,10 @@ public class HouseHelpService {
                 predicates.add(cb.equal(root.get("status"), filter.getStatus()));
             }
 
+            if (filter.getActive() != null) {
+                predicates.add(cb.equal(root.get("active"), filter.getActive()));
+            }
+
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
