@@ -39,10 +39,14 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
                 .collect(Collectors.toList());
 
-        // ✅ Always non-null principal
-        String principal = user.getEmail() != null
-                ? user.getEmail()
-                : user.getPhoneNumber();
+        String principal =
+                (user.getEmail() != null && !user.getEmail().isBlank())
+                        ? user.getEmail()
+                        : user.getPhoneNumber();
+
+        if (principal == null || principal.isBlank()) {
+            throw new UsernameNotFoundException("User has no valid login identifier");
+        }
 
         return new org.springframework.security.core.userdetails.User(
                 principal,
