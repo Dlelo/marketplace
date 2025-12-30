@@ -39,14 +39,13 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
                 .collect(Collectors.toList());
 
-        /**
-         * IMPORTANT:
-         * We return email as the username so that:
-         * - authentication.getName() is stable
-         * - JWT subject is consistent
-         */
+        // ✅ Always non-null principal
+        String principal = user.getEmail() != null
+                ? user.getEmail()
+                : user.getPhoneNumber();
+
         return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
+                principal,
                 user.getPassword(),
                 authorities
         );
