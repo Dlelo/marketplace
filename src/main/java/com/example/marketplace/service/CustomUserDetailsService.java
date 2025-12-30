@@ -10,12 +10,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
+
     private final UserRepository userRepository;
 
     @Autowired
@@ -24,20 +24,46 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
 
-        List<GrantedAuthority> authorities = user.getRoles() == null
-                ? new ArrayList<>()
-                : user.getRoles().stream()
+        String normalizedIdentifier = normalizeIdentifier(identifier);
+
+        User user = userRepository.findByEmail(normalizedIdentifier)
+                .or(() -> userRepository.findByPhoneNumber(normalizedIdentifier))
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found with email or phone")
+                );
+
+        List<GrantedAuthority> authorities = user.getRoles()
+                .stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
                 .collect(Collectors.toList());
 
+        /**
+         * IMPORTANT:
+         * We return email as the username so that:
+         * - authentication.getName() is stable
+         * - JWT subject is consistent
+         */
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
                 authorities
         );
+    }
+
+    /**
+     * Optional but recommended for Kenya 🇰🇪
+     */
+    private String normalizeIdentifier(String identifier) {
+        if (identifier == null) return null;
+
+        identifier = identifier.trim();
+
+        if (identifier.matches("^07\\d{8}$")) {
+            return "+254" + identifier.substring(1);
+        }
+
+        return identifier;
     }
 }

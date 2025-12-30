@@ -68,12 +68,16 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
-            if (loginRequest.getEmail() == null || loginRequest.getPassword() == null) {
-                return ResponseEntity.badRequest().body("Email and password are required.");
+            if (loginRequest.getIdentifier() == null || loginRequest.getPassword() == null) {
+                return ResponseEntity.badRequest()
+                        .body("Email or phone number and password are required.");
             }
+
+            String identifier = loginRequest.getIdentifier();
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            loginRequest.getEmail(),
+                            identifier,
                             loginRequest.getPassword()
                     )
             );
@@ -89,15 +93,23 @@ public class AuthController {
                 userId = user.getId();
                 role = extractRoleFromUser(user);
             } else {
-               User user = userService.findByEmail(email);
+               User user = userService.findByEmailOrPhone(identifier);
                 userId = user.getId();
                 role = extractRoleFromUser(user);
             }
 
-            String token = jwtUtil.generateToken(email, userId, role);
+            User user = userService.findByEmailOrPhone(identifier);
+
+            String subject = user.getEmail() != null
+                    ? user.getEmail()
+                    : user.getPhoneNumber();
+
+            String token = jwtUtil.generateToken(subject, userId, role);
 
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
+            response.put("userId", userId);
+            response.put("role", role);
 
             return ResponseEntity.ok(response);
         } catch (BadCredentialsException e) {

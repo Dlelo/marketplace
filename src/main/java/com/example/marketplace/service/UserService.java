@@ -34,36 +34,44 @@ public class UserService {
 
     public UserResponseDTO registerUser(RegisterRequest dto, String roleName) {
 
-        // Check duplicates
-        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email already exists");
+        // 1️⃣ Phone number is mandatory
+        if (dto.getPhoneNumber() == null || dto.getPhoneNumber().isBlank()) {
+            throw new IllegalArgumentException("Phone number is required");
         }
+
+        // 2️⃣ Check phone duplicate
         if (userRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()) {
             throw new IllegalArgumentException("Phone number already exists");
         }
 
-        // Default role = HOMEOWNER
+        // 3️⃣ Check email duplicate ONLY if provided
+        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
+            if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+                throw new IllegalArgumentException("Email already exists");
+            }
+        }
+
+        // 4️⃣ Resolve role
         String resolvedRoleName = (roleName == null || roleName.trim().isEmpty())
                 ? "HOMEOWNER"
                 : roleName.trim().toUpperCase();
 
-        // Load role
         Role role = roleRepository.findByName(resolvedRoleName)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Role " + resolvedRoleName + " does not exist. Please create it first."
                 ));
 
-        // Create user
+        // 5️⃣ Create user
         User user = new User();
-        user.setEmail(dto.getEmail());
         user.setPhoneNumber(dto.getPhoneNumber());
+        user.setEmail(dto.getEmail()); // may be null
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setName(dto.getName());
-        user.setRoles(new HashSet<>(Collections.singletonList(role)));
+        user.setRoles(Set.of(role));
 
         User savedUser = userRepository.save(user);
 
-        // Create default records for role
+        // 6️⃣ Create role-specific record
         switch (resolvedRoleName) {
             case "HOUSEHELP" -> {
                 HouseHelp houseHelp = new HouseHelp();
@@ -75,8 +83,6 @@ public class UserService {
                 HomeOwner homeOwner = new HomeOwner();
                 homeOwner.setUser(savedUser);
                 homeOwnerRepository.save(homeOwner);
-            }
-            default -> {
             }
         }
 
@@ -219,7 +225,6 @@ public class UserService {
         return response;
     }
 
-
     public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
         return userRepository.findAll(pageable)
                 .map(user -> {
@@ -238,6 +243,12 @@ public class UserService {
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public User findByEmailOrPhone(String identifier) {
+        return userRepository.findByEmail(identifier)
+                .or(() -> userRepository.findByPhoneNumber(identifier))
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
