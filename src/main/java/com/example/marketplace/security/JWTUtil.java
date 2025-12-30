@@ -23,31 +23,30 @@ public class JWTUtil {
     private static final Key SIGNING_KEY = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     private static final long EXPIRATION_HOURS = 24;
 
-//    public String generateToken(String email) {
-//        return Jwts.builder()
-//                .subject(email)
-//                .issuedAt(new Date())
-//                .expiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(EXPIRATION_HOURS)))
-//                .signWith(SIGNING_KEY)
-//                .compact();
-//    }
+    public String generateToken(UserDetails userDetails, Long userId) {
 
-    public String generateToken(String email, Long userId, String role) {
         Map<String, Object> claims = new HashMap<>();
+
         claims.put("userId", userId);
-        claims.put("role", role);
+
+        // ✅ Extract authorities properly
+        claims.put(
+                "roles",
+                userDetails.getAuthorities()
+                        .stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList())
+        );
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(email)
+                .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(EXPIRATION_HOURS)))
+                .setExpiration(
+                        new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(EXPIRATION_HOURS))
+                )
                 .signWith(SIGNING_KEY)
                 .compact();
-    }
-
-    public String generateToken(String email) {
-        return generateToken(email, null, null);
     }
 
     public Long extractUserId(String token) {
