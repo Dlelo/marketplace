@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -23,28 +24,24 @@ public class JWTUtil {
     private static final Key SIGNING_KEY = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     private static final long EXPIRATION_HOURS = 24;
 
+    // ✅ Generate token using UserDetails + userId
     public String generateToken(UserDetails userDetails, Long userId) {
 
         Map<String, Object> claims = new HashMap<>();
-
         claims.put("userId", userId);
 
-        // ✅ Extract authorities properly
-        claims.put(
-                "roles",
-                userDetails.getAuthorities()
-                        .stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toList())
-        );
+        // Include roles in the JWT
+        List<String> roles = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+        claims.put("roles", roles);
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(
-                        new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(EXPIRATION_HOURS))
-                )
+                .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(EXPIRATION_HOURS)))
                 .signWith(SIGNING_KEY)
                 .compact();
     }

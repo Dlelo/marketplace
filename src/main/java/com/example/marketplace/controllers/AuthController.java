@@ -14,12 +14,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -100,12 +102,21 @@ public class AuthController {
 
             User user = userService.findByEmailOrPhone(identifier);
 
-            String subject = user.getEmail() != null
-                    ? user.getEmail()
-                    : user.getPhoneNumber();
+            // 4️⃣ Build UserDetails for JWT
+            org.springframework.security.core.userdetails.User userDetails =
+                    new org.springframework.security.core.userdetails.User(
+                            user.getEmail() != null && !user.getEmail().isBlank()
+                                    ? user.getEmail()
+                                    : user.getPhoneNumber(),
+                            user.getPassword(),
+                            user.getRoles()
+                                    .stream()
+                                    .map(r -> new SimpleGrantedAuthority("ROLE_" + r.getName()))
+                                    .collect(Collectors.toList())
+                    );
 
-            String token = jwtUtil.generateToken(subject, userId, role);
-
+            // 5️⃣ Generate JWT
+            String token = jwtUtil.generateToken(userDetails, user.getId());
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
             response.put("userId", userId);
