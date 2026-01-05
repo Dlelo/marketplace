@@ -46,7 +46,7 @@ public class HouseHelpService {
         if (dto.getHeight() != null) houseHelp.setHeight(dto.getHeight());
         if (dto.getWeight() != null) houseHelp.setWeight(dto.getWeight());
         if (dto.getAge() != null) houseHelp.setAge(dto.getAge());
-        if (dto.getHouseHelpType() != null) houseHelp.setAge(dto.getAge());
+        if (dto.getHouseHelpType() != null) houseHelp.setHouseHelpType(dto.getHouseHelpType());
         if (dto.getGender() != null) houseHelp.setGender(dto.getGender());
         if(dto.getContactPersonsPhoneNumber()!=null) houseHelp.setContactPersonsPhoneNumber(dto.getContactPersonsPhoneNumber());
 
@@ -114,6 +114,7 @@ public class HouseHelpService {
         if (isBlank(houseHelp.getMedicalReport())) missing.add("medicalReport");
         if (isBlank(houseHelp.getGoodConduct())) missing.add("goodConduct");
         if (houseHelp.getYearsOfExperience() == null) missing.add("yearsOfExperience");
+        if (houseHelp.getHouseHelpType() == null) missing.add("houseHelpType");
         if (isBlank(houseHelp.getReligion())) missing.add("religion");
         if (houseHelp.getSkills() == null || houseHelp.getSkills().isEmpty()) missing.add("skills");
 
