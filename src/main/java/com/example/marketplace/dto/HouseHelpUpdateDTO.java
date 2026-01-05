@@ -1,5 +1,6 @@
 package com.example.marketplace.dto;
 
+import com.example.marketplace.enums.AvailabilityType;
 import lombok.Data;
 
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 @Data
 public class HouseHelpUpdateDTO {
     private Integer numberOfChildren;
+    private AvailabilityType houseHelpType;
     private List<String> languages;
     private String levelOfEducation;
     private String contactPersons;

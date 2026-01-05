@@ -4,6 +4,7 @@ import com.example.marketplace.dto.HouseHelpFilterDTO;
 import com.example.marketplace.dto.HouseHelpUpdateDTO;
 import com.example.marketplace.dto.HouseHelpUpdateResponseDTO;
 import com.example.marketplace.dto.HouseHelpVerificationResponseDTO;
+import com.example.marketplace.enums.AvailabilityType;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.repository.HouseHelpRepository;
 import jakarta.persistence.criteria.Predicate;
@@ -45,6 +46,7 @@ public class HouseHelpService {
         if (dto.getHeight() != null) houseHelp.setHeight(dto.getHeight());
         if (dto.getWeight() != null) houseHelp.setWeight(dto.getWeight());
         if (dto.getAge() != null) houseHelp.setAge(dto.getAge());
+        if (dto.getHouseHelpType() != null) houseHelp.setAge(dto.getAge());
         if (dto.getGender() != null) houseHelp.setGender(dto.getGender());
         if(dto.getContactPersonsPhoneNumber()!=null) houseHelp.setContactPersonsPhoneNumber(dto.getContactPersonsPhoneNumber());
 

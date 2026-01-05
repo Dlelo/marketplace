@@ -1,5 +1,6 @@
 package com.example.marketplace.model;
 
+import com.example.marketplace.enums.AvailabilityType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
@@ -45,6 +46,8 @@ public class HouseHelp {
     private String age;
     private String gender;
     private String localAuthorityVerificationDocument;
+    private AvailabilityType houseHelpType;
+
     @ElementCollection
     private List<String> skills;
 
