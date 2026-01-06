@@ -303,6 +303,12 @@ public class UserService {
         dto.setYearsOfExperience(houseHelp.getYearsOfExperience());
         dto.setReligion(houseHelp.getReligion());
         dto.setSkills(houseHelp.getSkills());
+        dto.setHeight(houseHelp.getHeight());
+        dto.setWeight(houseHelp.getWeight());
+        dto.setAge(houseHelp.getAge());
+        dto.setHouseHelpType(houseHelp.getHouseHelpType());
+        dto.setGender(houseHelp.getGender());
+        dto.setContactPersonsPhoneNumber(houseHelp.getContactPersonsPhoneNumber());
 
         return dto;
     }

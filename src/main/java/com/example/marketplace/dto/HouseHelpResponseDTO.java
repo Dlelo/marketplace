@@ -1,5 +1,6 @@
 package com.example.marketplace.dto;
 
+import com.example.marketplace.enums.AvailabilityType;
 import lombok.Data;
 
 import java.util.List;
@@ -19,4 +20,10 @@ public class HouseHelpResponseDTO {
     private Integer yearsOfExperience;
     private String religion;
     private List<String> skills;
+    private String height;
+    private String weight;
+    private String age;
+    private String gender;
+    private String contactPersonsPhoneNumber;
+    private AvailabilityType houseHelpType;
 }
