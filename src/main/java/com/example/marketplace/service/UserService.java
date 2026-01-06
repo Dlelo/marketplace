@@ -39,16 +39,20 @@ public class UserService {
             throw new IllegalArgumentException("Phone number is required");
         }
 
+        // Normalize email
+        String email = dto.getEmail();
+        if (email != null && email.isBlank()) {
+            email = null;
+        }
+
         // 2️⃣ Check phone duplicate
         if (userRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()) {
             throw new IllegalArgumentException("Phone number already exists");
         }
 
         // 3️⃣ Check email duplicate ONLY if provided
-        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
-            if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-                throw new IllegalArgumentException("Email already exists");
-            }
+        if (email != null && userRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("Email already exists");
         }
 
         // 4️⃣ Resolve role
@@ -64,7 +68,7 @@ public class UserService {
         // 5️⃣ Create user
         User user = new User();
         user.setPhoneNumber(dto.getPhoneNumber());
-        user.setEmail(dto.getEmail()); // may be null
+        user.setEmail(email); // ✅ now null or real value
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setName(dto.getName());
         user.setRoles(Set.of(role));
