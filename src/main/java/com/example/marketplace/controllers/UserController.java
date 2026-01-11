@@ -21,14 +21,14 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','SALES','SECURITY')")
     @GetMapping("")
     public ResponseEntity<Page<UserResponseDTO>> listUsers(Pageable pageable) {
         return ResponseEntity.ok(userService.getAllUsers(pageable));
     }
 
     @PostMapping("/search")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','SALES','SECURITY')")
     public ResponseEntity<Page<User>> searchUser(
             @RequestBody UserFilterDTO filter,
             Pageable pageable
@@ -36,7 +36,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findByFilterAndPage(filter, pageable));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'AGENT')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PatchMapping("/roles")
     public ResponseEntity<?> addRole(@RequestBody AddRoleToUserRequestDTO request) {
         try {
@@ -63,8 +63,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'AGENT', 'HOUSEHELP', 'HOMEOWNER')")
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'AGENT', 'HOUSEHELP', 'HOMEOWNER','SALES')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         try {
