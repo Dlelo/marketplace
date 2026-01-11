@@ -27,7 +27,7 @@ public class HouseHelpController {
     private final FileUploadService fileUploadService;
 
     @PostMapping("/search")
-    @PreAuthorize("hasAnyRole('AGENT','HOMEOWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('AGENT','HOMEOWNER','ADMIN','SALES','SECURITY')")
     public ResponseEntity<Page<HouseHelp>> searchHouseHelps(
             @RequestBody HouseHelpFilterDTO filter,
             Pageable pageable
@@ -43,7 +43,7 @@ public class HouseHelpController {
 
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasAnyRole('AGENT','ADMIN','HOUSEHELP')")
+    @PreAuthorize("hasAnyRole('AGENT','ADMIN','HOUSEHELP','SALES')")
     public HouseHelpUpdateResponseDTO updateHouseHelp(@PathVariable Long id, @RequestBody HouseHelpUpdateDTO dto) {
         return houseHelpService.updateHouseHelp(id, dto);
     }
@@ -65,10 +65,32 @@ public class HouseHelpController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('AGENT','HOMEOWNER','ADMIN','HOUSEHELP')")
+    @PreAuthorize("hasAnyRole('AGENT','HOMEOWNER','ADMIN','HOUSEHELP','SECURITY','SALES')")
     public ResponseEntity<HouseHelp> getHouseHelpById(@PathVariable Long id) {
         HouseHelp houseHelp = houseHelpService.getHouseHelpById(id);
         return ResponseEntity.ok(houseHelp);
+    }
+
+    @PreAuthorize("hasAnyRole('SECURITY')")
+    @PutMapping("/{id}/security-cleared")
+    public ResponseEntity<HouseHelp> setSecurityCleared(
+            @PathVariable Long id,
+            @RequestParam boolean cleared) {
+
+        return ResponseEntity.ok(
+                houseHelpService.setSecurityCleared(id, cleared)
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PutMapping("/{id}/active")
+    public ResponseEntity<HouseHelp> setActiveStatus(
+            @PathVariable Long id,
+            @RequestParam boolean active) {
+
+        return ResponseEntity.ok(
+                houseHelpService.setActiveStatus(id, active)
+        );
     }
 
 }

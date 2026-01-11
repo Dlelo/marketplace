@@ -52,4 +52,5 @@ public class HouseHelp {
     private List<String> skills;
 
     private boolean active = true;
+    private boolean securityCleared = false;
 }

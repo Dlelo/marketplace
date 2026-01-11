@@ -36,7 +36,7 @@ public class HomeOwnerController {
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'AGENT','HOMEOWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'AGENT','HOMEOWNER','SALES')")
     public ResponseEntity<HomeOwnerUpdateResponseDTO> updateHomeOwner(
             @PathVariable Long id,
             @RequestBody HomeOwnerUpdateDTO dto
@@ -61,9 +61,31 @@ public class HomeOwnerController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('AGENT','HOMEOWNER','ADMIN','HOUSEHELP')")
+    @PreAuthorize("hasAnyRole('AGENT','HOMEOWNER','ADMIN','HOUSEHELP','SECURITY','SALES')")
     public ResponseEntity<HomeOwner> getHomeOwnerById(@PathVariable Long id) {
         HomeOwner homeOwner = homeOwnerService.getHomeOwnerById(id);
         return ResponseEntity.ok(homeOwner);
+    }
+
+    @PreAuthorize("hasAnyRole('SECURITY')")
+    @PutMapping("/{id}/security-cleared")
+    public ResponseEntity<HomeOwner> setSecurityCleared(
+            @PathVariable Long id,
+            @RequestParam boolean cleared) {
+
+        return ResponseEntity.ok(
+                homeOwnerService.setSecurityCleared(id, cleared)
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PutMapping("/{id}/active")
+    public ResponseEntity<HomeOwner> setActiveStatus(
+            @PathVariable Long id,
+            @RequestParam boolean active) {
+
+        return ResponseEntity.ok(
+                homeOwnerService.setActiveStatus(id, active)
+        );
     }
 }

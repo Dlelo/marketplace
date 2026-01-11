@@ -42,4 +42,5 @@ public class HomeOwner {
     private List<HireRequest> hireRequests = new ArrayList<>();
 
     private boolean active = true;
+    private boolean securityCleared = false;
 }
