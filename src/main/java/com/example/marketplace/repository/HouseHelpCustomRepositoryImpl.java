@@ -32,8 +32,8 @@ public class HouseHelpCustomRepositoryImpl implements HouseHelpCustomRepository 
             predicates.add(cb.ge(root.get("experienceYears"), filter.getExperience()));
         }
 
-        if (filter.getAvailability() != null) {
-            predicates.add(cb.equal(root.get("availability"), filter.getAvailability()));
+        if (filter.getHouseHelpType() != null) {
+            predicates.add(cb.equal(root.get("houseHelpType"), filter.getHouseHelpType()));
         }
         if (filter.getMinExpectedSalary() != null) {
             predicates.add(cb.ge(root.get("expectedSalary"), filter.getMinExpectedSalary()));
