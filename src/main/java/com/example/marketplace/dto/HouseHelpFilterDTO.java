@@ -22,7 +22,7 @@ public class HouseHelpFilterDTO {
     private HouseHelpStatus status;
 
     // Availability type (e.g., FULL_TIME, PART_TIME, LIVE_IN, LIVE_OUT)
-    private AvailabilityType availability;
+    private AvailabilityType houseHelpType;
 
     // Salary range
     private Double minExpectedSalary;
