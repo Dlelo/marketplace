@@ -85,8 +85,8 @@ public class HouseHelpService {
                 predicates.add(cb.like(cb.lower(root.get("currentLocation")), "%" + filter.getLocation().toLowerCase() + "%"));
             }
 
-            if (filter.getAvailability() != null) {
-                predicates.add(cb.equal(root.get("availability"), filter.getAvailability()));
+            if (filter.getHouseHelpType() != null) {
+                predicates.add(cb.equal(root.get("houseHelpType"), filter.getHouseHelpType()));
             }
 
             if (filter.getStatus() != null) {

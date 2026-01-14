@@ -21,7 +21,6 @@ public class HouseHelpFilterDTO {
 
     private HouseHelpStatus status;
 
-    // Availability type (e.g., FULL_TIME, PART_TIME, LIVE_IN, LIVE_OUT)
     private AvailabilityType houseHelpType;
 
     // Salary range
