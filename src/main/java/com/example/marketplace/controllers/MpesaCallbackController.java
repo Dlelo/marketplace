@@ -1,5 +1,6 @@
 package com.example.marketplace.controllers;
 
+import com.example.marketplace.dto.ManualMpesaCallBackRequest;
 import com.example.marketplace.enums.PaymentStatus;
 import com.example.marketplace.model.Payment;
 import com.example.marketplace.repository.PaymentRepository;
@@ -34,6 +35,26 @@ public class MpesaCallbackController {
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 
         if (resultCode == 0) {
+            payment.setStatus(PaymentStatus.SUCCESS);
+            subscriptionService.handleSuccessfulPayment(payment.getUser().getEmail(), payment);
+        } else {
+            payment.setStatus(PaymentStatus.FAILED);
+        }
+
+        paymentRepository.save(payment);
+        return ResponseEntity.ok("Callback processed");
+    }
+
+    @PostMapping("/manual-callback")
+    public ResponseEntity<String> handleManualCallback(@RequestBody ManualMpesaCallBackRequest request) {
+        // Extract CheckoutRequestID and ResultCode
+
+        String transactionId = request.getTransactionId();
+
+        Payment payment = paymentRepository.findFirstByTransactionId(transactionId)
+                .orElseThrow(() -> new RuntimeException("Payment not found"));
+
+        if (request.getStatus() == PaymentStatus.SUCCESS) {
             payment.setStatus(PaymentStatus.SUCCESS);
             subscriptionService.handleSuccessfulPayment(payment.getUser().getEmail(), payment);
         } else {

@@ -35,7 +35,7 @@ public class HouseHelpController {
         return ResponseEntity.ok(houseHelpService.findByFilterAndPage(filter, pageable));
     }
 
-    @PutMapping("/verify/{id}")
+    @PutMapping("/verify/{houseHelpId}")
     @PreAuthorize("hasAnyRole('AGENT','ADMIN')")
     public ResponseEntity<HouseHelpVerificationResponseDTO> verifyHouseHelp(@PathVariable Long houseHelpId) {
         return ResponseEntity.ok(houseHelpService.verifyHouseHelp(houseHelpId));
