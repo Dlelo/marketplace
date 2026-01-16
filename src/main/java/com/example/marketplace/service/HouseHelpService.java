@@ -60,12 +60,12 @@ public class HouseHelpService {
     public HouseHelpVerificationResponseDTO verifyHouseHelp(Long houseHelpId) {
         HouseHelp houseHelp = houseHelpRepository.findById(houseHelpId)
                 .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
-
-        List<String> missingFields = getMissingFields(houseHelp);
-
-        if (!missingFields.isEmpty()) {
-            return HouseHelpVerificationResponseDTO.fromEntity(houseHelp, missingFields);
-        }
+        // TODO bring back after strict data collection or decide on the important
+//        List<String> missingFields = getMissingFields(houseHelp);
+//
+//        if (!missingFields.isEmpty()) {
+//            return HouseHelpVerificationResponseDTO.fromEntity(houseHelp, missingFields);
+//        }
 
         houseHelp.setVerified(true);
         HouseHelp saved = houseHelpRepository.save(houseHelp);
