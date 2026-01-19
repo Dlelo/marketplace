@@ -134,6 +134,7 @@ public class PaymentService {
                     dto.setCreatedAt(payment.getCreatedAt());
                     dto.setUserId(payment.getUser().getId());
                     dto.setUserEmail(payment.getUser().getEmail());
+                    dto.setUserName(payment.getUser().getName());
                     return dto;
                 });
     }
