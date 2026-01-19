@@ -17,4 +17,5 @@ public class PaymentResponseDTO {
     private LocalDateTime createdAt;
     private Long userId;
     private String userEmail;
+    private  String userName;
 }
