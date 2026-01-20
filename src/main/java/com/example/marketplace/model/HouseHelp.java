@@ -53,4 +53,7 @@ public class HouseHelp {
 
     private boolean active = true;
     private boolean securityCleared = false;
+
+    @Embedded
+    private HouseHelpPreference preferences;
 }

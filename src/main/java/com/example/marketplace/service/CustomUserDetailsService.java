@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -24,29 +23,29 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String identifier)
+            throws UsernameNotFoundException {
 
-        String normalizedIdentifier = normalizeIdentifier(identifier);
+        String raw = identifier != null ? identifier.trim() : null;
+        String normalized = normalizeIdentifier(raw);
 
-        User user = userRepository.findByEmail(normalizedIdentifier)
-                .or(() -> userRepository.findByPhoneNumber(normalizedIdentifier))
+        User user = userRepository.findByEmail(raw)
+                .or(() -> userRepository.findByPhoneNumber(raw))
+                .or(() -> userRepository.findByEmail(normalized))
+                .or(() -> userRepository.findByPhoneNumber(normalized))
                 .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found with email or phone")
+                        new UsernameNotFoundException(
+                                "User not found with email or phone: " + identifier
+                        )
                 );
 
-        List<GrantedAuthority> authorities = user.getRoles()
-                .stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
-                .collect(Collectors.toList());
+        List<GrantedAuthority> authorities = user.getRoles().stream()
+                .map(role -> (GrantedAuthority) new SimpleGrantedAuthority("ROLE_" + role.getName()))
+                .toList();
 
-        String principal =
-                (user.getEmail() != null && !user.getEmail().isBlank())
-                        ? user.getEmail()
-                        : user.getPhoneNumber();
-
-        if (principal == null || principal.isBlank()) {
-            throw new UsernameNotFoundException("User has no valid login identifier");
-        }
+        String principal = (user.getEmail() != null && !user.getEmail().isBlank())
+                ? user.getEmail()
+                : user.getPhoneNumber();
 
         return new org.springframework.security.core.userdetails.User(
                 principal,
