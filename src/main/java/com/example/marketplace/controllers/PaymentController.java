@@ -25,6 +25,7 @@ public class PaymentController {
      */
     @PostMapping("/initiate")
     public ResponseEntity<Map<String, Object>> initiatePayment(@RequestBody PaymentRequest request) {
+
         try {
             Map<String, Object> response = paymentService.initiatePayment(
                     request.getPhoneNumber(),
