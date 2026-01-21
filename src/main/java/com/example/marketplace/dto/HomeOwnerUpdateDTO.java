@@ -15,4 +15,5 @@ public class HomeOwnerUpdateDTO {
     private String numberOfRooms; // e.g. title deed scan
     private Integer numberOfDependents;// uploaded file path / reference
     private String nationalIdDocument;
+    private String profilePictureDocument;
 }

@@ -36,6 +36,7 @@ public class HouseHelp {
     private String currentLocation;
     private String nationalId;
     private String nationalIdDocument;
+    private String profilePictureDocument;
     private String contactPersonsPhoneNumber;
     private String medicalReport;
     private String goodConduct;
