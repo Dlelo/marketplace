@@ -1,13 +1,16 @@
 package com.example.marketplace.service;
 
+import com.example.marketplace.dto.HomeOwnerFilterDTO;
 import com.example.marketplace.dto.HomeOwnerUpdateDTO;
 import com.example.marketplace.dto.HomeOwnerUpdateResponseDTO;
 import com.example.marketplace.model.HomeOwner;
 
 import com.example.marketplace.repository.HomeOwnerRepository;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -111,4 +114,33 @@ public class HomeOwnerService {
         homeOwner.setActive(active);
         return homeOwnerRepository.save(homeOwner);
     }
+
+    public Page<HomeOwner> findByFilterAndPage(HomeOwnerFilterDTO filter, Pageable pageable) {
+        return homeOwnerRepository.findAll(buildSpecification(filter), pageable);
+    }
+
+    private Specification<HomeOwner> buildSpecification(HomeOwnerFilterDTO filter) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (filter.getHomeLocation() != null && !filter.getHomeLocation().isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("homeLocation")), "%" + filter.getHomeLocation().toLowerCase() + "%"));
+            }
+
+            if (filter.getHouseType() != null) {
+                predicates.add(cb.equal(root.get("houseType"), filter.getHouseType()));
+            }
+
+            if (filter.getNumberOfRooms() != null) {
+                predicates.add(cb.equal(root.get("numberOfRooms"), filter.getNumberOfRooms()));
+            }
+
+            if (filter.getActive() != null) {
+                predicates.add(cb.equal(root.get("active"), filter.getActive()));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
 }

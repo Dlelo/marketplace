@@ -1,10 +1,7 @@
 package com.example.marketplace.controllers;
 
-import com.example.marketplace.dto.HomeOwnerUpdateDTO;
-import com.example.marketplace.dto.HomeOwnerUpdateResponseDTO;
-import com.example.marketplace.dto.SecurityClearanceRequest;
+import com.example.marketplace.dto.*;
 import com.example.marketplace.model.HomeOwner;
-import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.repository.HomeOwnerRepository;
 import com.example.marketplace.service.FileUploadService;
 import com.example.marketplace.service.HomeOwnerService;
@@ -34,6 +31,16 @@ public class HomeOwnerController {
     public ResponseEntity<Page<HomeOwner>> getAllHomeOwners(Pageable pageable) {
         return ResponseEntity.ok(homeOwnerService.getAllHomeOwners(pageable));
     }
+
+    @PostMapping("/search")
+    @PreAuthorize("hasAnyRole('AGENT','ADMIN','SALES','SECURITY')")
+    public ResponseEntity<Page<HomeOwner>> searchHomeOwner(
+            @RequestBody HomeOwnerFilterDTO filter,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(homeOwnerService.findByFilterAndPage(filter, pageable));
+    }
+
 
     @PutMapping("/verify/{id}")
     @PreAuthorize("hasAnyRole('AGENT','ADMIN')")
