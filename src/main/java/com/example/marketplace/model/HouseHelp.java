@@ -53,6 +53,7 @@ public class HouseHelp {
 
     private boolean active = true;
     private boolean securityCleared = false;
+    private String securityClearanceComments;
 
     @Embedded
     private HouseHelpPreference preferences;

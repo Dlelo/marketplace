@@ -43,6 +43,7 @@ public class HomeOwner {
 
     private boolean active = true;
     private boolean securityCleared = false;
+    private String securityClearanceComments;
 
     @Embedded
     private HomeOwnerPreference preferences;
