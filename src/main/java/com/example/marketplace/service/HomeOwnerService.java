@@ -4,7 +4,6 @@ import com.example.marketplace.dto.HomeOwnerUpdateDTO;
 import com.example.marketplace.dto.HomeOwnerUpdateResponseDTO;
 import com.example.marketplace.model.HomeOwner;
 
-import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.repository.HomeOwnerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -88,6 +87,20 @@ public class HomeOwnerService {
                 .orElseThrow(() -> new RuntimeException("HomeOwner not found"));
 
         homeOwner.setSecurityCleared(securityCleared);
+        return homeOwnerRepository.save(homeOwner);
+    }
+
+    public HomeOwner setSecurityCleared(
+            Long id,
+            boolean securityCleared,
+            String comments
+    ) {
+        HomeOwner homeOwner = homeOwnerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("HomeOwner not found"));
+
+        homeOwner.setSecurityCleared(securityCleared);
+        homeOwner.setSecurityClearanceComments(comments);
+
         return homeOwnerRepository.save(homeOwner);
     }
 

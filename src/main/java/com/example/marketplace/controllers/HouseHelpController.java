@@ -1,13 +1,11 @@
 package com.example.marketplace.controllers;
 
-import com.example.marketplace.dto.HouseHelpFilterDTO;
-import com.example.marketplace.dto.HouseHelpUpdateDTO;
-import com.example.marketplace.dto.HouseHelpUpdateResponseDTO;
-import com.example.marketplace.dto.HouseHelpVerificationResponseDTO;
+import com.example.marketplace.dto.*;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.repository.HouseHelpRepository;
 import com.example.marketplace.service.FileUploadService;
 import com.example.marketplace.service.HouseHelpService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -71,16 +69,22 @@ public class HouseHelpController {
         return ResponseEntity.ok(houseHelp);
     }
 
+
     @PreAuthorize("hasAnyRole('SECURITY')")
     @PutMapping("/{id}/security-cleared")
     public ResponseEntity<HouseHelp> setSecurityCleared(
             @PathVariable Long id,
-            @RequestParam boolean cleared) {
-
+            @Valid @RequestBody SecurityClearanceRequest request
+    ) {
         return ResponseEntity.ok(
-                houseHelpService.setSecurityCleared(id, cleared)
+                houseHelpService.setSecurityCleared(
+                        id,
+                        request.isCleared(),
+                        request.getComments()
+                )
         );
     }
+
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PutMapping("/{id}/active")

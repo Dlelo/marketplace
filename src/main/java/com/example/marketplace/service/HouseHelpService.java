@@ -130,13 +130,20 @@ public class HouseHelpService {
                 .orElseThrow(() -> new RuntimeException("HouseHelp not found with id: " + id));
     }
 
-    public HouseHelp setSecurityCleared(Long houseHelpId, boolean securityCleared) {
+    public HouseHelp setSecurityCleared(
+            Long houseHelpId,
+            boolean securityCleared,
+            String comments
+    ) {
         HouseHelp houseHelp = houseHelpRepository.findById(houseHelpId)
                 .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
 
         houseHelp.setSecurityCleared(securityCleared);
+        houseHelp.setSecurityClearanceComments(comments);
+
         return houseHelpRepository.save(houseHelp);
     }
+
 
     public HouseHelp setActiveStatus(Long houseHelpId, boolean active) {
         HouseHelp houseHelp = houseHelpRepository.findById(houseHelpId)

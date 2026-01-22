@@ -2,11 +2,13 @@ package com.example.marketplace.controllers;
 
 import com.example.marketplace.dto.HomeOwnerUpdateDTO;
 import com.example.marketplace.dto.HomeOwnerUpdateResponseDTO;
+import com.example.marketplace.dto.SecurityClearanceRequest;
 import com.example.marketplace.model.HomeOwner;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.repository.HomeOwnerRepository;
 import com.example.marketplace.service.FileUploadService;
 import com.example.marketplace.service.HomeOwnerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -108,10 +110,14 @@ public class HomeOwnerController {
     @PutMapping("/{id}/security-cleared")
     public ResponseEntity<HomeOwner> setSecurityCleared(
             @PathVariable Long id,
-            @RequestParam boolean cleared) {
-
+            @Valid @RequestBody SecurityClearanceRequest request
+    ) {
         return ResponseEntity.ok(
-                homeOwnerService.setSecurityCleared(id, cleared)
+                homeOwnerService.setSecurityCleared(
+                        id,
+                        request.isCleared(),
+                        request.getComments()
+                )
         );
     }
 
