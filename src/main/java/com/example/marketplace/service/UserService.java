@@ -321,6 +321,8 @@ public class UserService {
         dto.setNationalId(homeOwner.getNationalId());
         dto.setHomeLocation(homeOwner.getHomeLocation());
         dto.setPhoneNumber(homeOwner.getPhoneNumber());
+        dto.setNationalIdDocument(homeOwner.getNationalIdDocument());
+        dto.setProfilePictureDocument(homeOwner.getProfilePictureDocument());
         return dto;
     }
 
