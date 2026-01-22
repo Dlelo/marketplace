@@ -15,6 +15,8 @@ public class HouseHelpResponseDTO {
     private String homeLocation;
     private String currentLocation;
     private String nationalId;
+    private String nationalIdDocument;
+    private String profilePictureDocument;
     private String medicalReport;
     private String goodConduct;
     private Integer yearsOfExperience;

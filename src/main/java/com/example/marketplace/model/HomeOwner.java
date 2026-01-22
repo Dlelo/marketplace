@@ -27,6 +27,7 @@ public class HomeOwner {
     private String numberOfRooms;
     private Integer numberOfDependents;
     private String nationalIdDocument;
+    private String profilePictureDocument;
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
