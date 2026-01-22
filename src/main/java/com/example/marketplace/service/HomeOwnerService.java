@@ -85,14 +85,6 @@ public class HomeOwnerService {
                 .orElseThrow(() -> new RuntimeException("Homeowner not found with id: " + id));
     }
 
-    public HomeOwner setSecurityCleared(Long id, boolean securityCleared) {
-        HomeOwner homeOwner = homeOwnerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("HomeOwner not found"));
-
-        homeOwner.setSecurityCleared(securityCleared);
-        return homeOwnerRepository.save(homeOwner);
-    }
-
     public HomeOwner setSecurityCleared(
             Long id,
             boolean securityCleared,
