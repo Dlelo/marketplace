@@ -24,10 +24,37 @@ public class Payment {
     private User user;
 
     private Double amount;
+    private Double baseFee;             // Original plan fee (500, 2500, 2500)
+    private Double surchargeFee;        // County surcharge amount
+    private String surchargeReason;
+
     private String provider; // M-PESA
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
     private LocalDateTime createdAt;
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
+
+    /**
+     * Check if payment has surcharge
+     */
+    public boolean hasSurcharge() {
+        return surchargeFee != null && surchargeFee > 0;
+    }
+
+    /**
+     * Get surcharge percentage of total
+     */
+//    public double getSurchargePercentage() {
+//        if (amount == null || amount == 0) {
+//            return 0;
+//        }
+//        return (surchargeFee != null ? surchargeFee : 0) / amount * 100;
+//    }
 }
