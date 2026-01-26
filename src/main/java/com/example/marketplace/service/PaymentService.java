@@ -53,9 +53,11 @@ public class PaymentService {
         String transactionId = phoneNumber + "-" + today;
         Payment payment = Payment.builder()
                 .user(user)
-//                .transactionId(response.get("CheckoutRequestID").toString())
                 .transactionId(transactionId)
                 .amount(amount)
+                .baseFee(amount)           // For subscriptions, baseFee = amount
+                .surchargeFee(0.0)         // No surcharge for subscriptions
+                .surchargeReason(null)     // No surcharge reason
                 .provider("M-PESA")
                 .status(PaymentStatus.PENDING)
                 .createdAt(LocalDateTime.now())
@@ -101,6 +103,9 @@ public class PaymentService {
                     }
                     if ("Amount".equals(name)) {
                         payment.setAmount(Double.valueOf(value.toString()));
+                        if (payment.getBaseFee() == null) {
+                            payment.setBaseFee(Double.valueOf(value.toString()));
+                        }
                     }
                 }
             }
@@ -129,6 +134,12 @@ public class PaymentService {
                     dto.setId(payment.getId());
                     dto.setTransactionId(payment.getTransactionId());
                     dto.setAmount(payment.getAmount());
+
+                    // NEW: Add surcharge breakdown
+                    dto.setBaseFee(payment.getBaseFee());
+                    dto.setSurchargeFee(payment.getSurchargeFee());
+                    dto.setSurchargeReason(payment.getSurchargeReason());
+
                     dto.setProvider(payment.getProvider());
                     dto.setStatus(payment.getStatus());
                     dto.setCreatedAt(payment.getCreatedAt());
@@ -146,7 +157,13 @@ public class PaymentService {
         paymentDto.setId(payment.getId());
         paymentDto.setTransactionId(payment.getTransactionId());
         paymentDto.setStatus(payment.getStatus());
+        paymentDto.setAmount(payment.getAmount());
 //        paymentDto.setUserEmail(payment.getUserEmail());
+
+        //Add surcharge breakdown
+        paymentDto.setBaseFee(payment.getBaseFee());
+        paymentDto.setSurchargeFee(payment.getSurchargeFee());
+        paymentDto.setSurchargeReason(payment.getSurchargeReason());
 
         return paymentDto;
     }

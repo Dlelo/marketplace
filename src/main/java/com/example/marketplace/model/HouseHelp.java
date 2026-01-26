@@ -1,6 +1,7 @@
 package com.example.marketplace.model;
 
 import com.example.marketplace.enums.AvailabilityType;
+import com.example.marketplace.enums.CountyOptions;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
@@ -33,7 +34,14 @@ public class HouseHelp {
     private String levelOfEducation;
     private String contactPersons;
     private String homeLocation;
+
+    @Enumerated(EnumType.STRING)
+    private CountyOptions homeCounty;
+
     private String currentLocation;
+    @Enumerated(EnumType.STRING)
+    private CountyOptions currentCounty;
+
     private String nationalId;
     private String nationalIdDocument;
     private String profilePictureDocument;
@@ -58,4 +66,17 @@ public class HouseHelp {
 
     @Embedded
     private HouseHelpPreference preferences;
+
+
+    public int getCountySurcharge() {
+        if (currentCounty == null) {
+            return 0;
+        }
+        return currentCounty.getSurchargeAmount();
+    }
+
+
+    public boolean isInNairobi() {
+        return currentCounty != null && currentCounty.isNairobi();
+    }
 }

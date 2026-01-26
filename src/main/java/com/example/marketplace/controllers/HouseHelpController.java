@@ -1,6 +1,7 @@
 package com.example.marketplace.controllers;
 
 import com.example.marketplace.dto.*;
+import com.example.marketplace.model.HomeOwner;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.repository.HouseHelpRepository;
 import com.example.marketplace.service.FileUploadService;
@@ -9,12 +10,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/househelp")
@@ -96,5 +100,37 @@ public class HouseHelpController {
                 houseHelpService.setActiveStatus(id, active)
         );
     }
+
+    @PostMapping("/{id}/profile-picture")
+    public ResponseEntity<?> uploadHouseHelpProfilePicture(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+
+        try {
+            String fileUrl = fileUploadService.uploadProfilePicture(file);
+
+            HouseHelp houseHelp = houseHelpRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Househelp not found"));
+
+            houseHelp.setProfilePictureDocument(fileUrl);
+            houseHelpRepository.save(houseHelp);
+            Map<String, String> response = new HashMap<>();
+            response.put("url", fileUrl);
+            response.put("message", "Profile picture uploaded successfully");
+
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("error", e.getMessage()));
+
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Upload failed: " + e.getMessage()));
+        }
+    }
+
 
 }

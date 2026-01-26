@@ -296,8 +296,12 @@ public class UserService {
         dto.setLevelOfEducation(houseHelp.getLevelOfEducation());
         dto.setContactPersons(houseHelp.getContactPersons());
         dto.setHomeLocation(houseHelp.getHomeLocation());
+        dto.setHomeCounty(houseHelp.getHomeCounty());
         dto.setCurrentLocation(houseHelp.getCurrentLocation());
+        dto.setCurrentCounty(houseHelp.getCurrentCounty());
         dto.setNationalId(houseHelp.getNationalId());
+        dto.setNationalIdDocument(houseHelp.getNationalIdDocument());
+        dto.setProfilePictureDocument(houseHelp.getProfilePictureDocument());
         dto.setMedicalReport(houseHelp.getMedicalReport());
         dto.setGoodConduct(houseHelp.getGoodConduct());
         dto.setYearsOfExperience(houseHelp.getYearsOfExperience());
