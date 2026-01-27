@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/marketplace?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+
+      SPACES_ACCESS_KEY: ${SPACES_ACCESS_KEY:}
+      SPACES_SECRET_KEY: ${SPACES_SECRET_KEY:}
+      DO_SPACES_ENDPOINT: https://fra1.digitaloceanspaces.com
+      DO_SPACES_BUCKET: yaya-docs
+      DO_SPACES_REGION: us-east-1
+
+      DARAJA_CONSUMER_KEY: ${DARAJA_CONSUMER_KEY:}
+      DARAJA_SECRET_KEY: ${DARAJA_SECRET_KEY:}
+      DARAJA_BUSINESS_SHORTCODE: ${DARAJA_BUSINESS_SHORTCODE:}
+      DARAJA_PASSKEY: ${DARAJA_PASSKEY:}
+      DARAJA_CALLBACK_URL: ${DARAJA_CALLBACK_URL:}
+      DARAJA_BASE_URL: ${DARAJA_BASE_URL:}
+
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: marketplace
+      MYSQL_USER: marketplace_user
+      MYSQL_PASSWORD: marketplace_pass
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
