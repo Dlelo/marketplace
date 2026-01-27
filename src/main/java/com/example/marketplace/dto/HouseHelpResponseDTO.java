@@ -28,4 +28,7 @@ public class HouseHelpResponseDTO {
     private String gender;
     private String contactPersonsPhoneNumber;
     private AvailabilityType houseHelpType;
+    private GeoLocationResponseDTO pinLocation;
+    private Integer maxTravelDistanceKm;
+    private HouseHelpPreferenceResponseDTO preferences;
 }

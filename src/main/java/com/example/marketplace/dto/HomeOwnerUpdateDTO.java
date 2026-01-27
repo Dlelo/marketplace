@@ -16,4 +16,7 @@ public class HomeOwnerUpdateDTO {
     private Integer numberOfDependents;// uploaded file path / reference
     private String nationalIdDocument;
     private String profilePictureDocument;
+    private HomeOwnerPreferenceUpdateDTO preferences;
+    private GeoLocationUpdateDTO pinLocation;
+    private Integer maxDistanceKm;
 }

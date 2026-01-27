@@ -1,0 +1,17 @@
+package com.example.marketplace.enums;
+
+public enum CareService {
+    NANNYING,
+    PICKUP_DROPOFF,
+    DAILY_CHILD_CARE_ROUTINE,
+    EDUCATIONAL_PLAY,
+    HOUSEKEEPING,
+    COOKING,
+    FOREIGN_LANGUAGE_CARE,
+    HOMEWORK_HELP,
+    EVENTS,
+    SHOPPING_RUNS,
+    TRACKING_CHILD_DEVELOPMENT,
+    TOILET_TRAINING,
+    PET_CARE
+}

@@ -49,4 +49,15 @@ public class HomeOwner {
     @Embedded
     private HomeOwnerPreference preferences;
 
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "latitude", column = @Column(name = "home_owner_lat")),
+            @AttributeOverride(name = "longitude", column = @Column(name = "home_owner_lng")),
+            @AttributeOverride(name = "placeName", column = @Column(name = "home_owner_place")),
+            @AttributeOverride(name = "addressLine", column = @Column(name = "home_owner_address"))
+    })
+    private GeoLocation pinLocation;
+
+    private Integer maxDistanceKm;
+
 }

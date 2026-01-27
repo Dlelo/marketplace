@@ -1,49 +1,29 @@
-package com.example.marketplace.model;
+package com.example.marketplace.dto;
 
-import com.example.marketplace.enums.AvailabilityType;
-import com.example.marketplace.enums.CareService;
-import com.example.marketplace.enums.ChildAgeRange;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import com.example.marketplace.enums.*;
 import lombok.Data;
 
 import java.util.List;
 
-@Embeddable
 @Data
-public class HomeOwnerPreference {
+public class HomeOwnerPreferenceUpdateDTO {
 
-    @Enumerated(EnumType.STRING)
     private AvailabilityType houseHelpType;
-
     private Integer minExperience;
-
     private String location;
 
-    @ElementCollection
     private List<String> preferredSkills;
-
-    @ElementCollection
     private List<String> preferredLanguages;
 
-    private Integer minMatchScore = 50;
+    private Integer minMatchScore;
 
-    @ElementCollection
-    @Enumerated(EnumType.STRING)
     private List<ChildAgeRange> childrenAgeRanges;
-
     private Integer numberOfChildren;
 
-    @ElementCollection
-    @Enumerated(EnumType.STRING)
     private List<CareService> requiredServices;
 
     private Boolean hasPets;
-
     private String religionPreference;
-
     private Boolean requiresSecurityCleared;
 
     private Integer preferredMaxAge;

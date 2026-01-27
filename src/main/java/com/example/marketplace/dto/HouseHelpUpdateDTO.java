@@ -27,4 +27,7 @@ public class HouseHelpUpdateDTO {
     private String age;
     private String gender;
     private String localAuthorityVerificationDocument;
+    private HouseHelpPreferenceUpdateDTO preferences;
+    private GeoLocationUpdateDTO pinLocation;
+    private Integer maxTravelDistanceKm;
 }
