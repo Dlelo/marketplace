@@ -313,6 +313,33 @@ public class UserService {
         dto.setHouseHelpType(houseHelp.getHouseHelpType());
         dto.setGender(houseHelp.getGender());
         dto.setContactPersonsPhoneNumber(houseHelp.getContactPersonsPhoneNumber());
+        dto.setMaxTravelDistanceKm(houseHelp.getMaxTravelDistanceKm());
+
+        if (houseHelp.getPinLocation() != null) {
+            GeoLocationResponseDTO loc = new GeoLocationResponseDTO();
+            loc.setLatitude(houseHelp.getPinLocation().getLatitude());
+            loc.setLongitude(houseHelp.getPinLocation().getLongitude());
+            loc.setPlaceName(houseHelp.getPinLocation().getPlaceName());
+            loc.setAddressLine(houseHelp.getPinLocation().getAddressLine());
+            dto.setPinLocation(loc);
+        }
+
+        if (houseHelp.getPreferences() != null) {
+            HouseHelpPreferenceResponseDTO p = new HouseHelpPreferenceResponseDTO();
+            p.setHouseHelpType(houseHelp.getPreferences().getHouseHelpType());
+            p.setMinExperience(houseHelp.getPreferences().getMinExperience());
+            p.setPreferredLocation(houseHelp.getPreferences().getPreferredLocation());
+            p.setPreferredSkills(houseHelp.getPreferences().getPreferredSkills());
+            p.setPreferredLanguages(houseHelp.getPreferences().getPreferredLanguages());
+            p.setPreferredChildAgeRanges(houseHelp.getPreferences().getPreferredChildAgeRanges());
+            p.setPreferredMaxChildren(houseHelp.getPreferences().getPreferredMaxChildren());
+            p.setPreferredServices(houseHelp.getPreferences().getPreferredServices());
+            p.setPreferredReligion(houseHelp.getPreferences().getPreferredReligion());
+            p.setOkayWithPets(houseHelp.getPreferences().getOkayWithPets());
+            p.setMinSalary(houseHelp.getPreferences().getMinSalary());
+            p.setMaxSalary(houseHelp.getPreferences().getMaxSalary());
+            dto.setPreferences(p);
+        }
 
         return dto;
     }

@@ -2,6 +2,8 @@ package com.example.marketplace.model;
 
 import com.example.marketplace.enums.AvailabilityType;
 import com.example.marketplace.enums.CountyOptions;
+import com.example.marketplace.enums.CareService;
+import com.example.marketplace.enums.ChildAgeRange;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
@@ -56,6 +58,18 @@ public class HouseHelp {
     private String gender;
     private String localAuthorityVerificationDocument;
     private AvailabilityType houseHelpType;
+    private String availability;
+
+    @Column(length = 1000)
+    private String experienceSummary;
+
+    @Enumerated(EnumType.STRING)
+    private List<ChildAgeRange> childAgeRanges;
+
+    @Enumerated(EnumType.STRING)
+    private List<CareService> services;
+
+    private Integer maxChildren;
 
     @ElementCollection
     private List<String> skills;
@@ -79,4 +93,17 @@ public class HouseHelp {
     public boolean isInNairobi() {
         return currentCounty != null && currentCounty.isNairobi();
     }
+
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "latitude", column = @Column(name = "house_help_lat")),
+            @AttributeOverride(name = "longitude", column = @Column(name = "house_help_lng")),
+            @AttributeOverride(name = "placeName", column = @Column(name = "house_help_place")),
+            @AttributeOverride(name = "addressLine", column = @Column(name = "house_help_address"))
+    })
+    private GeoLocation pinLocation;
+
+    private Integer maxTravelDistanceKm;
+
 }

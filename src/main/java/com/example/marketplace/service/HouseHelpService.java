@@ -1,11 +1,9 @@
 package com.example.marketplace.service;
 
-import com.example.marketplace.dto.HouseHelpFilterDTO;
-import com.example.marketplace.dto.HouseHelpUpdateDTO;
-import com.example.marketplace.dto.HouseHelpUpdateResponseDTO;
-import com.example.marketplace.dto.HouseHelpVerificationResponseDTO;
-import com.example.marketplace.enums.AvailabilityType;
+import com.example.marketplace.dto.*;
+import com.example.marketplace.model.GeoLocation;
 import com.example.marketplace.model.HouseHelp;
+import com.example.marketplace.model.HouseHelpPreference;
 import com.example.marketplace.repository.HouseHelpRepository;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +49,12 @@ public class HouseHelpService {
         if (dto.getHouseHelpType() != null) houseHelp.setHouseHelpType(dto.getHouseHelpType());
         if (dto.getGender() != null) houseHelp.setGender(dto.getGender());
         if(dto.getContactPersonsPhoneNumber()!=null) houseHelp.setContactPersonsPhoneNumber(dto.getContactPersonsPhoneNumber());
+
+        if (dto.getMaxTravelDistanceKm() != null) {
+            dto.setMaxTravelDistanceKm(dto.getMaxTravelDistanceKm());
+        }
+        updatePreferences(houseHelp, dto.getPreferences());
+        updatePinLocation(houseHelp, dto.getPinLocation());
 
         HouseHelp updated = houseHelpRepository.save(houseHelp);
 
@@ -102,6 +106,50 @@ public class HouseHelpService {
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
+
+    private void updatePreferences(HouseHelp help, HouseHelpPreferenceUpdateDTO dto) {
+        if (dto == null) return;
+
+        if (help.getPreferences() == null) {
+            help.setPreferences(new HouseHelpPreference());
+        }
+
+        HouseHelpPreference p = help.getPreferences();
+
+        if (dto.getHouseHelpType() != null) p.setHouseHelpType(dto.getHouseHelpType());
+        if (dto.getMinExperience() != null) p.setMinExperience(dto.getMinExperience());
+        if (dto.getPreferredLocation() != null) p.setPreferredLocation(dto.getPreferredLocation());
+
+        if (dto.getPreferredSkills() != null) p.setPreferredSkills(dto.getPreferredSkills());
+        if (dto.getPreferredLanguages() != null) p.setPreferredLanguages(dto.getPreferredLanguages());
+
+        if (dto.getPreferredChildAgeRanges() != null) p.setPreferredChildAgeRanges(dto.getPreferredChildAgeRanges());
+        if (dto.getPreferredMaxChildren() != null) p.setPreferredMaxChildren(dto.getPreferredMaxChildren());
+
+        if (dto.getPreferredServices() != null) p.setPreferredServices(dto.getPreferredServices());
+
+        if (dto.getPreferredReligion() != null) p.setPreferredReligion(dto.getPreferredReligion());
+        if (dto.getOkayWithPets() != null) p.setOkayWithPets(dto.getOkayWithPets());
+
+        if (dto.getMinSalary() != null) p.setMinSalary(dto.getMinSalary());
+        if (dto.getMaxSalary() != null) p.setMaxSalary(dto.getMaxSalary());
+    }
+
+    private void updatePinLocation(HouseHelp help, GeoLocationUpdateDTO dto) {
+        if (dto == null) return;
+
+        if (help.getPinLocation() == null) {
+            help.setPinLocation(new GeoLocation());
+        }
+
+        GeoLocation g = help.getPinLocation();
+
+        if (dto.getLatitude() != null) g.setLatitude(dto.getLatitude());
+        if (dto.getLongitude() != null) g.setLongitude(dto.getLongitude());
+        if (dto.getPlaceName() != null) g.setPlaceName(dto.getPlaceName());
+        if (dto.getAddressLine() != null) g.setAddressLine(dto.getAddressLine());
+    }
+
 
     private List<String> getMissingFields(HouseHelp houseHelp) {
         List<String> missing = new ArrayList<>();
