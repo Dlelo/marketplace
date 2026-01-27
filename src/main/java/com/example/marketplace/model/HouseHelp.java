@@ -1,9 +1,6 @@
 package com.example.marketplace.model;
 
-import com.example.marketplace.enums.AvailabilityType;
-import com.example.marketplace.enums.CountyOptions;
-import com.example.marketplace.enums.CareService;
-import com.example.marketplace.enums.ChildAgeRange;
+import com.example.marketplace.enums.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
@@ -105,5 +102,30 @@ public class HouseHelp {
     private GeoLocation pinLocation;
 
     private Integer maxTravelDistanceKm;
+
+    @OneToMany(mappedBy = "houseHelp", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("houseHelp")
+    private List<Contract> contracts;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private HiringStatus hiringStatus = HiringStatus.AVAILABLE;
+
+
+    public boolean isCurrentlyHired() {
+        return contracts != null && contracts.stream()
+                .anyMatch(Contract::isActive);
+    }
+
+    public Contract getCurrentContract() {
+        return contracts != null ? contracts.stream()
+                .filter(Contract::isActive)
+                .findFirst()
+                .orElse(null) : null;
+    }
+
+    public boolean hasActiveContract() {
+        return getCurrentContract() != null;
+    }
 
 }
