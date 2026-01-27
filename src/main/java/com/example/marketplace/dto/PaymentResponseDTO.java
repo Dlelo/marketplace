@@ -18,4 +18,22 @@ public class PaymentResponseDTO {
     private Long userId;
     private String userEmail;
     private  String userName;
+
+    // Surcharge breakdown
+    private Double baseFee;
+    private Double surchargeFee;
+    private String surchargeReason;
+
+    public boolean hasSurcharge() {
+        return surchargeFee != null && surchargeFee > 0;
+    }
+
+    public String getBreakdownSummary() {
+        if (hasSurcharge()) {
+            return String.format("Base: KES %.2f + Surcharge: KES %.2f (%s) = Total: KES %.2f",
+                    baseFee, surchargeFee, surchargeReason, amount);
+        } else {
+            return String.format("Total: KES %.2f (No surcharge)", amount);
+        }
+    }
 }

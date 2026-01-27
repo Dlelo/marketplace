@@ -1,11 +1,17 @@
+
 package com.example.marketplace.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
@@ -22,8 +28,8 @@ public class FileUploadService {
     @Value("${do.spaces.bucket}")
     private String bucket;
 
-    @Value("${do.spaces.endpoint}")   // e.g. https://your-bucket.region.digitaloceanspaces.com
-    private String endpoint;
+    @Value("${do.spaces.cdn-endpoint}")
+    private String cdnEndpoint;
 
     // Allowed file types
     private static final List<String> ALLOWED_IMAGE_TYPES = Arrays.asList("image/jpeg", "image/jpg");
@@ -41,9 +47,7 @@ public class FileUploadService {
 
         try {
             String key = "profile-pictures/" + UUID.randomUUID() + "-" + sanitizeFilename(file.getOriginalFilename());
-
             return uploadToS3(file, key);
-
         } catch (IOException e) {
             throw new RuntimeException("Profile picture upload failed", e);
         }
@@ -57,9 +61,7 @@ public class FileUploadService {
 
         try {
             String key = "national-ids/" + UUID.randomUUID() + "-" + sanitizeFilename(file.getOriginalFilename());
-
             return uploadToS3(file, key);
-
         } catch (IOException e) {
             throw new RuntimeException("National ID upload failed", e);
         }
@@ -73,9 +75,7 @@ public class FileUploadService {
 
         try {
             String key = "good-conduct/" + UUID.randomUUID() + "-" + sanitizeFilename(file.getOriginalFilename());
-
             return uploadToS3(file, key);
-
         } catch (IOException e) {
             throw new RuntimeException("Good conduct certificate upload failed", e);
         }
@@ -89,9 +89,7 @@ public class FileUploadService {
 
         try {
             String key = "medical-reports/" + UUID.randomUUID() + "-" + sanitizeFilename(file.getOriginalFilename());
-
             return uploadToS3(file, key);
-
         } catch (IOException e) {
             throw new RuntimeException("Medical report upload failed", e);
         }
@@ -103,9 +101,7 @@ public class FileUploadService {
     public String upload(MultipartFile file) {
         try {
             String key = "documents/" + UUID.randomUUID() + "-" + sanitizeFilename(file.getOriginalFilename());
-
             return uploadToS3(file, key);
-
         } catch (IOException e) {
             throw new RuntimeException("File upload failed", e);
         }
@@ -144,20 +140,33 @@ public class FileUploadService {
     }
 
     /**
-     * Upload file to S3/DigitalOcean Spaces
+     * Upload file to S3/DigitalOcean Spaces with public-read ACL
+     * Returns CDN URL for public access
      */
     private String uploadToS3(MultipartFile file, String key) throws IOException {
+        System.out.println("=== UPLOAD DEBUG ===");
+        System.out.println("Bucket: " + bucket);
+        System.out.println("Key: " + key);
+        System.out.println("Content Type: " + file.getContentType());
+        System.out.println("File Size: " + file.getSize() + " bytes");
+        // Upload to S3 using the regular endpoint (configured in SpacesConfig)
         s3Client.putObject(
                 PutObjectRequest.builder()
                         .bucket(bucket)
                         .key(key)
                         .contentType(file.getContentType())
-                        .acl("public-read")
+                        .acl(ObjectCannedACL.PUBLIC_READ)
                         .build(),
                 RequestBody.fromBytes(file.getBytes())
         );
 
-        return endpoint + "/" + key;
+        // Return CDN URL for public access
+//        return cdnEndpoint + "/" + key;
+        String cdnUrl = cdnEndpoint + "/" + key;
+        System.out.println("CDN URL: " + cdnUrl);
+        System.out.println("===================");
+
+        return cdnUrl;
     }
 
     /**
@@ -182,8 +191,8 @@ public class FileUploadService {
      */
     public void deleteFile(String fileUrl) {
         try {
-            // Extract key from URL
-            String key = fileUrl.replace(endpoint + "/", "");
+            // Extract key from CDN URL
+            String key = fileUrl.replace(cdnEndpoint + "/", "");
 
             s3Client.deleteObject(builder -> builder
                     .bucket(bucket)
@@ -193,6 +202,27 @@ public class FileUploadService {
 
         } catch (Exception e) {
             throw new RuntimeException("File deletion failed", e);
+        }
+    }
+
+    public byte[] fetchFile(String fileUrl) {
+        try {
+            // Extract key from URL
+            String key = fileUrl.replace(cdnEndpoint + "/", "");
+
+            // Fetch object from S3
+            ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObject(
+                    GetObjectRequest.builder()
+                            .bucket(bucket)
+                            .key(key)
+                            .build(),
+                    ResponseTransformer.toBytes()
+            );
+
+            return objectBytes.asByteArray();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch file: " + fileUrl, e);
         }
     }
 }
