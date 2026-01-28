@@ -2,6 +2,7 @@ package com.example.marketplace.dto;
 
 import com.example.marketplace.enums.AvailabilityType;
 import com.example.marketplace.enums.CountyOptions;
+import jakarta.persistence.Column;
 import lombok.Data;
 import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
@@ -34,4 +35,6 @@ public class HouseHelpUpdateDTO {
     private HouseHelpPreferenceUpdateDTO preferences;
     private GeoLocationUpdateDTO pinLocation;
     private Integer maxTravelDistanceKm;
+    private String availability;
+    private String experienceSummary;
 }

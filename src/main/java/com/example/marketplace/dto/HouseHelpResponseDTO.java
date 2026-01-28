@@ -34,4 +34,6 @@ public class HouseHelpResponseDTO {
     private GeoLocationResponseDTO pinLocation;
     private Integer maxTravelDistanceKm;
     private HouseHelpPreferenceResponseDTO preferences;
+    private String availability;
+    private String experienceSummary;
 }
