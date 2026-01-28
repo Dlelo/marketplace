@@ -50,7 +50,7 @@ public class HouseHelpService {
         if (dto.getGender() != null) houseHelp.setGender(dto.getGender());
         if(dto.getContactPersonsPhoneNumber()!=null) houseHelp.setContactPersonsPhoneNumber(dto.getContactPersonsPhoneNumber());
         if (dto.getAvailability() != null) houseHelp.setAvailability(dto.getAvailability());
-        if (dto.getExperienceSummary() != null) houseHelp.setAvailability(dto.getExperienceSummary());
+        if (dto.getExperienceSummary() != null) houseHelp.setExperienceSummary(dto.getExperienceSummary());
 
         if (dto.getMaxTravelDistanceKm() != null) {
             dto.setMaxTravelDistanceKm(dto.getMaxTravelDistanceKm());
