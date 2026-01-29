@@ -51,7 +51,7 @@ public class HouseHelpService {
         if(dto.getContactPersonsPhoneNumber()!=null) houseHelp.setContactPersonsPhoneNumber(dto.getContactPersonsPhoneNumber());
         if (dto.getAvailability() != null) houseHelp.setAvailability(dto.getAvailability());
         if (dto.getExperienceSummary() != null) houseHelp.setExperienceSummary(dto.getExperienceSummary());
-
+        if (dto.getHiringStatus() != null) houseHelp.setHiringStatus(dto.getHiringStatus());
         if (dto.getMaxTravelDistanceKm() != null) {
             dto.setMaxTravelDistanceKm(dto.getMaxTravelDistanceKm());
         }
@@ -103,6 +103,10 @@ public class HouseHelpService {
 
             if (filter.getActive() != null) {
                 predicates.add(cb.equal(root.get("active"), filter.getActive()));
+            }
+
+            if (filter.getHiringStatus() != null) {
+                predicates.add(cb.equal(root.get("hiringStatus"), filter.getHiringStatus()));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
