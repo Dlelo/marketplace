@@ -20,4 +20,5 @@ public enum Skills {
     LAUNDRY,
     HOUSEKEEPING,
     IRONING,
+    DISH_WASHING
 }
