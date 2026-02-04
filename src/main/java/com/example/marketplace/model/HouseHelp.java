@@ -1,9 +1,6 @@
 package com.example.marketplace.model;
 
-import com.example.marketplace.enums.AvailabilityType;
-import com.example.marketplace.enums.CountyOptions;
-import com.example.marketplace.enums.CareService;
-import com.example.marketplace.enums.ChildAgeRange;
+import com.example.marketplace.enums.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
@@ -31,7 +28,8 @@ public class HouseHelp {
     private Integer numberOfChildren;
 
     @ElementCollection
-    private List<String> languages;
+    @Enumerated(EnumType.STRING)
+    private List<Languages> languages;
 
     private String levelOfEducation;
     private String contactPersons;
@@ -63,16 +61,19 @@ public class HouseHelp {
     @Column(length = 1000)
     private String experienceSummary;
 
+    @ElementCollection
     @Enumerated(EnumType.STRING)
     private List<ChildAgeRange> childAgeRanges;
 
+    @ElementCollection
     @Enumerated(EnumType.STRING)
     private List<CareService> services;
 
     private Integer maxChildren;
 
     @ElementCollection
-    private List<String> skills;
+    @Enumerated(EnumType.STRING)
+    private List<Skills> skills;
 
     private boolean active = true;
     private boolean securityCleared = false;

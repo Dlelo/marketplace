@@ -2,6 +2,8 @@ package com.example.marketplace.dto;
 
 import com.example.marketplace.enums.AvailabilityType;
 import com.example.marketplace.enums.CountyOptions;
+import com.example.marketplace.enums.Languages;
+import com.example.marketplace.enums.Skills;
 import jakarta.persistence.Column;
 import lombok.Data;
 import software.amazon.awssdk.services.s3.endpoints.internal.Value;
@@ -12,7 +14,7 @@ import java.util.List;
 public class HouseHelpUpdateDTO {
     private Integer numberOfChildren;
     private AvailabilityType houseHelpType;
-    private List<String> languages;
+    private List<Languages> languages;
     private String levelOfEducation;
     private String contactPersons;
     private String contactPersonsPhoneNumber;
@@ -25,7 +27,7 @@ public class HouseHelpUpdateDTO {
     private String goodConduct;
     private Integer yearsOfExperience;
     private String religion;
-    private List<String> skills;
+    private List<Skills> skills;
     private String nationalIdDocument;
     private String height;
     private String weight;

@@ -424,12 +424,7 @@ public class UserService {
                     houseHelp.setActive(true);
                     houseHelp.setVerified(dto.getVerified() != null ? dto.getVerified() : false);
                     houseHelp.setYearsOfExperience(dto.getYearsOfExperience());
-                    if (dto.getSkills() != null) {
-                        houseHelp.setSkills(Arrays.stream(dto.getSkills().split(","))
-                                .map(String::trim)
-                                .filter(s -> !s.isEmpty())
-                                .collect(Collectors.toList()));
-                    }
+                    houseHelp.setSkills(dto.getSkills());
                     user.setHouseHelp(houseHelp);
                     houseHelpRepository.save(houseHelp);
                 }

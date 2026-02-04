@@ -2,6 +2,8 @@ package com.example.marketplace.dto;
 
 import com.example.marketplace.enums.AvailabilityType;
 import com.example.marketplace.enums.CountyOptions;
+import com.example.marketplace.enums.Languages;
+import com.example.marketplace.enums.Skills;
 import lombok.Data;
 
 import java.util.List;
@@ -10,7 +12,7 @@ import java.util.List;
 public class HouseHelpResponseDTO {
     private Long id;
     private Integer numberOfChildren;
-    private List<String> languages;
+    private List<Languages> languages;
     private String levelOfEducation;
     private String contactPersons;
     private String homeLocation;
@@ -24,7 +26,7 @@ public class HouseHelpResponseDTO {
     private String goodConduct;
     private Integer yearsOfExperience;
     private String religion;
-    private List<String> skills;
+    private List<Skills> skills;
     private String height;
     private String weight;
     private String age;

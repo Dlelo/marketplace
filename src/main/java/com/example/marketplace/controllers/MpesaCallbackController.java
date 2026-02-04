@@ -1,6 +1,7 @@
 package com.example.marketplace.controllers;
 
 import com.example.marketplace.dto.ManualMpesaCallBackRequest;
+import com.example.marketplace.dto.MpesaCallbackPayloadDTO;
 import com.example.marketplace.enums.PaymentStatus;
 import com.example.marketplace.model.Payment;
 import com.example.marketplace.repository.PaymentRepository;
@@ -23,13 +24,13 @@ public class MpesaCallbackController {
     private final SubscriptionService subscriptionService;
 
     @PostMapping("/callback")
-    public ResponseEntity<String> handleCallback(@RequestBody Map<String, Object> payload) {
+    public ResponseEntity<String> handleCallback(@RequestBody MpesaCallbackPayloadDTO payload) {
         // Extract CheckoutRequestID and ResultCode
-        Map<String, Object> stkCallback = (Map<String, Object>) payload.get("Body");
-        Map<String, Object> callback = (Map<String, Object>) stkCallback.get("stkCallback");
+        MpesaCallbackPayloadDTO.StkCallback callback =
+                payload.getBody().getStkCallback();
 
-        String checkoutRequestId = (String) callback.get("CheckoutRequestID");
-        int resultCode = (Integer) callback.get("ResultCode");
+        String checkoutRequestId = callback.getCheckoutRequestID();
+        int resultCode = callback.getResultCode();
 
         Payment payment = paymentRepository.findFirstByTransactionId(checkoutRequestId)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));

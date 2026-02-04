@@ -1,6 +1,9 @@
 package com.example.marketplace.dto;
 
+import com.example.marketplace.enums.Skills;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class UpdateUserRequest {
@@ -17,6 +20,6 @@ public class UpdateUserRequest {
 
     // Optional: HouseHelp fields
     private Integer yearsOfExperience;
-    private String skills;
+    private List<Skills> skills;
     private Boolean verified;
 }

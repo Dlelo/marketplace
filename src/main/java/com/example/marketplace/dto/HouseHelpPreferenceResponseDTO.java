@@ -12,8 +12,8 @@ public class HouseHelpPreferenceResponseDTO {
     private Integer minExperience;
     private String preferredLocation;
 
-    private List<String> preferredSkills;
-    private List<String> preferredLanguages;
+    private List<Skills> preferredSkills;
+    private List<Languages> preferredLanguages;
 
     private List<ChildAgeRange> preferredChildAgeRanges;
     private Integer preferredMaxChildren;
