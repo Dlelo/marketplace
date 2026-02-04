@@ -12,8 +12,8 @@ public class HomeOwnerPreferenceUpdateDTO {
     private Integer minExperience;
     private String location;
 
-    private List<String> preferredSkills;
-    private List<String> preferredLanguages;
+    private List<Skills> preferredSkills;
+    private List<Languages> preferredLanguages;
 
     private Integer minMatchScore;
 

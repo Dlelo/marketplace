@@ -1,8 +1,6 @@
 package com.example.marketplace.model;
 
-import com.example.marketplace.enums.AvailabilityType;
-import com.example.marketplace.enums.CareService;
-import com.example.marketplace.enums.ChildAgeRange;
+import com.example.marketplace.enums.*;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -21,10 +19,12 @@ public class HouseHelpPreference {
     private String preferredLocation;
 
     @ElementCollection
-    private List<String> preferredSkills;
+    @Enumerated(EnumType.STRING)
+    private List<Skills> preferredSkills;
 
     @ElementCollection
-    private List<String> preferredLanguages;
+    @Enumerated(EnumType.STRING)
+    private List<Languages> preferredLanguages;
 
     @ElementCollection
     @Enumerated(EnumType.STRING)

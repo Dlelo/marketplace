@@ -1,0 +1,22 @@
+package com.example.marketplace.enums;
+
+public enum Skills {
+    COOKING,
+    COOK_CHAPATI,
+    COOK_MANDAZI,
+    BAKE_CAKE,
+    BAKE_BREAD,
+    COOK_FRIES,
+    COOK_BHAGIA,
+    COOK_NYAMA_CHOMA,
+    COOKING_KENYAN_DISHES,
+    BABYSITTING,
+    ELDERS_CARE,
+    SPECIAL_NEEDS_CARE,
+    MOTHER_HELP_AFTER_DELIVERY,
+    DRIVE,
+    SHOPPING_RUNS,
+    CLEANING,
+    LAUNDRY,
+    HOUSEKEEPING,
+}
