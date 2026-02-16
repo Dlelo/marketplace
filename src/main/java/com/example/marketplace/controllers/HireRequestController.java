@@ -30,7 +30,7 @@ public class HireRequestController {
     private final HouseHelpService houseHelpService;
 
     @GetMapping
-    public ResponseEntity<Page<HireRequest>> getAllHireRequests(Pageable pageable) {
+    public ResponseEntity<Page<HireRequestResponseDTO>> getAllHireRequests(Pageable pageable) {
         return ResponseEntity.ok(hireRequestService.getAllHireRequests(pageable));
     }
 

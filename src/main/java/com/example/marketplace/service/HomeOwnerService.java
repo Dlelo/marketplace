@@ -23,7 +23,7 @@ public class HomeOwnerService {
 
     // -------------------- CRUD & Updates --------------------
 
-    public Page<HomeOwner> getAllHomeOwners(Pageable pageable) {
+    public Page<HomeOwnerResponseDTO> getAllHomeOwners(Pageable pageable) {
         return homeOwnerRepository.findAll(pageable);
     }
 

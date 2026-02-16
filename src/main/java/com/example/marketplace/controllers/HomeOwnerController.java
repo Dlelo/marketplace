@@ -28,7 +28,7 @@ public class HomeOwnerController {
     private final FileUploadService fileUploadService;
 
     @GetMapping
-    public ResponseEntity<Page<HomeOwner>> getAllHomeOwners(Pageable pageable) {
+    public ResponseEntity<Page<HomeOwnerResponseDTO>> getAllHomeOwners(Pageable pageable) {
         return ResponseEntity.ok(homeOwnerService.getAllHomeOwners(pageable));
     }
 

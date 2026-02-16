@@ -14,7 +14,9 @@ import com.example.marketplace.repository.HouseHelpRepository;
 import com.example.marketplace.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -68,7 +70,7 @@ public class HireRequestService {
      */
     public List<HireRequestResponseDTO> getRequestsForHouseHelp(Long houseHelpId) {
         return hireRequestRepository.findByHouseHelp_Id(houseHelpId).stream()
-                .map(this::mapToResponseDTO)
+                .map(hireRequestMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
 
@@ -77,7 +79,7 @@ public class HireRequestService {
      */
     public List<HireRequestResponseDTO> findByHomeOwner_Id(Long homeOwnerId) {
         return hireRequestRepository.findByHomeOwner_Id(homeOwnerId).stream()
-                .map(this::mapToResponseDTO)
+                .map(hireRequestMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
 
@@ -92,8 +94,9 @@ public class HireRequestService {
     /**
      * Get paginated list of all hire requests.
      */
-    public Page<HireRequest> getAllHireRequests(Pageable pageable) {
-        return hireRequestRepository.findAll(pageable);
+    public Page<HireRequestResponseDTO> getAllHireRequests(Pageable pageable) {
+        return hireRequestRepository.findAll(pageable)
+                .map(hireRequestMapper::toResponseDto);
     }
 
     // -------------------- 🔹 Private Helpers -------------------- //
@@ -118,14 +121,5 @@ public class HireRequestService {
             throw new IllegalArgumentException("HouseHelp must be verified before hiring");
         }
         return houseHelp;
-    }
-
-    private HireRequestResponseDTO mapToResponseDTO(HireRequest hireRequest) {
-        HireRequestResponseDTO dto = new HireRequestResponseDTO();
-        dto.setId(hireRequest.getId());
-        dto.setHomeOwnerId(hireRequest.getHomeOwner().getId());
-        dto.setHouseHelpId(hireRequest.getHouseHelp().getId());
-        dto.setStatus(hireRequest.getStatus());
-        return dto;
     }
 }
