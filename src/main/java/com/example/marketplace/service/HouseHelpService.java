@@ -1,6 +1,7 @@
 package com.example.marketplace.service;
 
 import com.example.marketplace.dto.*;
+import com.example.marketplace.mapper.HouseHelpMapper;
 import com.example.marketplace.model.GeoLocation;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.model.HouseHelpPreference;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HouseHelpService {
     private final HouseHelpRepository houseHelpRepository;
+    private final HouseHelpMapper houseHelpMapper;
 
     public Page<HouseHelp> getAllHouseHelps(Pageable pageable) {
         return houseHelpRepository.findAll(pageable);
@@ -81,8 +83,9 @@ public class HouseHelpService {
         return HouseHelpVerificationResponseDTO.fromEntity(saved, List.of());
     }
 
-    public Page<HouseHelp> findByFilterAndPage(HouseHelpFilterDTO filter, Pageable pageable) {
-        return houseHelpRepository.findAll(buildSpecification(filter), pageable);
+    public Page<HouseHelpResponseDTO> findByFilterAndPage(HouseHelpFilterDTO filter, Pageable pageable) {
+        return houseHelpRepository.findAll(buildSpecification(filter), pageable)
+                .map(houseHelpMapper::toDTO);
     }
 
     private Specification<HouseHelp> buildSpecification(HouseHelpFilterDTO filter) {

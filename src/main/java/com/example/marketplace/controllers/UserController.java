@@ -29,7 +29,7 @@ public class UserController {
 
     @PostMapping("/search")
     @PreAuthorize("hasAnyRole('ADMIN','SALES','SECURITY')")
-    public ResponseEntity<Page<User>> searchUser(
+    public ResponseEntity<Page<UserResponseDTO>> searchUser(
             @RequestBody UserFilterDTO filter,
             Pageable pageable
     ) {

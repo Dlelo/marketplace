@@ -30,7 +30,7 @@ public class HouseHelpController {
 
     @PostMapping("/search")
     @PreAuthorize("hasAnyRole('AGENT','HOMEOWNER','ADMIN','SALES','SECURITY')")
-    public ResponseEntity<Page<HouseHelp>> searchHouseHelps(
+    public ResponseEntity<Page<HouseHelpResponseDTO>> searchHouseHelps(
             @RequestBody HouseHelpFilterDTO filter,
             Pageable pageable
     ) {
