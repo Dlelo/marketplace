@@ -108,9 +108,7 @@ public class HireRequestService {
             if (hr.getHouseHelp() != null) {
                 HireRequestListDTO.HouseHelpRef hhRef = new HireRequestListDTO.HouseHelpRef();
                 hhRef.setId(hr.getHouseHelp().getId());
-                if (hr.getHouseHelp().getUser() != null) {
-                    hhRef.setName(hr.getHouseHelp().getUser().getName());
-                }
+                hhRef.setName(hr.getHouseHelp().getName());
                 dto.setHouseHelp(hhRef);
             }
 
