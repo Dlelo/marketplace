@@ -103,7 +103,8 @@ public class HouseHelpService {
             dto.setCurrentLocation(hh.getCurrentLocation());
             dto.setYearsOfExperience(hh.getYearsOfExperience());
             dto.setHouseHelpType(hh.getHouseHelpType());
-            dto.setSkills(hh.getSkills());
+            dto.setSkills(hh.getSkills() == null ? null :
+                    hh.getSkills().stream().map(Enum::name).collect(Collectors.toList()));
             if (hh.getUser() != null) {
                 HouseHelpListDTO.UserSummary u = new HouseHelpListDTO.UserSummary();
                 u.setId(hh.getUser().getId());
