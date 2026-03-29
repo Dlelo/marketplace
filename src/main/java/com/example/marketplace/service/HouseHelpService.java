@@ -97,6 +97,13 @@ public class HouseHelpService {
             HouseHelpListDTO dto = new HouseHelpListDTO();
             dto.setId(hh.getId());
             dto.setActive(hh.isActive());
+            dto.setVerified(hh.isVerified());
+            dto.setSecurityCleared(hh.isSecurityCleared());
+            dto.setProfilePictureDocument(hh.getProfilePictureDocument());
+            dto.setCurrentLocation(hh.getCurrentLocation());
+            dto.setYearsOfExperience(hh.getYearsOfExperience());
+            dto.setHouseHelpType(hh.getHouseHelpType());
+            dto.setSkills(hh.getSkills());
             if (hh.getUser() != null) {
                 HouseHelpListDTO.UserSummary u = new HouseHelpListDTO.UserSummary();
                 u.setId(hh.getUser().getId());
