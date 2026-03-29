@@ -1,5 +1,6 @@
 package com.example.marketplace.model;
 import com.example.marketplace.enums.RequestStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,9 +24,11 @@ public class HireRequest {
 
     @ManyToOne
     @JoinColumn(name = "home_owner_id")
+    @JsonIgnoreProperties({"hireRequests", "preferences"})
     private HomeOwner homeOwner;
 
     @ManyToOne
+    @JsonIgnoreProperties({"houseHelp", "homeOwner", "roles", "createdBy"})
     private User houseHelp;
 
     @Enumerated(EnumType.STRING)
