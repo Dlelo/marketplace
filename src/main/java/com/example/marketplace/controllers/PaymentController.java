@@ -58,15 +58,38 @@ public class PaymentController {
         return ResponseEntity.ok(paymentService.getAllPayments(pageable));
     }
 
-    @GetMapping("/status/{transactionId}")
-    public ResponseEntity<?> verifyPayment(@PathVariable String transactionId) {
-        try{
-            PaymentResponseDTO payment = paymentService.findByTransactionId(transactionId);
-            return ResponseEntity.ok(payment);
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/archived")
+    public ResponseEntity<Page<PaymentResponseDTO>> listArchivedPayments(Pageable pageable) {
+        return ResponseEntity.ok(paymentService.getArchivedPayments(pageable));
+    }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/verify")
+    public ResponseEntity<PaymentResponseDTO> verifyPaymentManually(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(paymentService.verifyPaymentManually(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/archive")
+    public ResponseEntity<PaymentResponseDTO> archivePayment(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(paymentService.archivePayment(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @GetMapping("/status/{transactionId}")
+    public ResponseEntity<?> getPaymentByTransactionId(@PathVariable String transactionId) {
+        try {
+            return ResponseEntity.ok(paymentService.findByTransactionId(transactionId));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-
     }
 }

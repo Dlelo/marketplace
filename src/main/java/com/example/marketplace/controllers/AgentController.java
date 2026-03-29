@@ -2,6 +2,7 @@ package com.example.marketplace.controllers;
 
 import com.example.marketplace.dto.AgentUpdateDTO;
 import com.example.marketplace.dto.AgentUpdateResponseDTO;
+import com.example.marketplace.dto.UserResponseDTO;
 import com.example.marketplace.model.Agent;
 import com.example.marketplace.service.AgentService;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +20,8 @@ public class AgentController {
     private final AgentService agentService;
 
     @GetMapping
-    public ResponseEntity<Page<Agent>> getAllAgents(Pageable pageable) {
-        return ResponseEntity.ok(agentService.getAllAgents(pageable));
+    public ResponseEntity<Page<UserResponseDTO>> getAllAgents(Pageable pageable) {
+        return ResponseEntity.ok(agentService.getUsersWithAgentRole(pageable));
     }
 
     @PutMapping("/verify/{id}")

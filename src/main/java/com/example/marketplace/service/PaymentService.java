@@ -138,44 +138,51 @@ public class PaymentService {
     }
 
     public Page<PaymentResponseDTO> getAllPayments(Pageable pageable) {
-        return paymentRepository.findAll(pageable)
-                .map(payment -> {
-                    PaymentResponseDTO dto = new PaymentResponseDTO();
-                    dto.setId(payment.getId());
-                    dto.setTransactionId(payment.getTransactionId());
-                    dto.setAmount(payment.getAmount());
+        return paymentRepository.findAllByArchivedFalse(pageable)
+                .map(this::toDTO);
+    }
 
-                    // NEW: Add surcharge breakdown
-                    dto.setBaseFee(payment.getBaseFee());
-                    dto.setSurchargeFee(payment.getSurchargeFee());
-                    dto.setSurchargeReason(payment.getSurchargeReason());
+    public Page<PaymentResponseDTO> getArchivedPayments(Pageable pageable) {
+        return paymentRepository.findAllByArchivedTrue(pageable)
+                .map(this::toDTO);
+    }
 
-                    dto.setProvider(payment.getProvider());
-                    dto.setStatus(payment.getStatus());
-                    dto.setCreatedAt(payment.getCreatedAt());
-                    dto.setUserId(payment.getUser().getId());
-                    dto.setUserEmail(payment.getUser().getEmail());
-                    dto.setUserName(payment.getUser().getName());
-                    return dto;
-                });
+    public PaymentResponseDTO verifyPaymentManually(Long id) {
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Payment not found: " + id));
+        payment.setStatus(PaymentStatus.SUCCESS);
+        return toDTO(paymentRepository.save(payment));
+    }
+
+    public PaymentResponseDTO archivePayment(Long id) {
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Payment not found: " + id));
+        payment.setArchived(true);
+        return toDTO(paymentRepository.save(payment));
+    }
+
+    private PaymentResponseDTO toDTO(Payment payment) {
+        PaymentResponseDTO dto = new PaymentResponseDTO();
+        dto.setId(payment.getId());
+        dto.setTransactionId(payment.getTransactionId());
+        dto.setAmount(payment.getAmount());
+        dto.setBaseFee(payment.getBaseFee());
+        dto.setSurchargeFee(payment.getSurchargeFee());
+        dto.setSurchargeReason(payment.getSurchargeReason());
+        dto.setProvider(payment.getProvider());
+        dto.setStatus(payment.getStatus());
+        dto.setCreatedAt(payment.getCreatedAt());
+        dto.setArchived(payment.isArchived());
+        dto.setUserId(payment.getUser().getId());
+        dto.setUserEmail(payment.getUser().getEmail());
+        dto.setUserName(payment.getUser().getName());
+        return dto;
     }
 
     public PaymentResponseDTO findByTransactionId(String transactionId){
-        Payment payment =  paymentRepository.findFirstByTransactionId(transactionId)
+        Payment payment = paymentRepository.findFirstByTransactionId(transactionId)
                 .orElseThrow(() -> new RuntimeException("Payment not found with transactionId: " + transactionId));
-        PaymentResponseDTO paymentDto = new PaymentResponseDTO();
-        paymentDto.setId(payment.getId());
-        paymentDto.setTransactionId(payment.getTransactionId());
-        paymentDto.setStatus(payment.getStatus());
-        paymentDto.setAmount(payment.getAmount());
-//        paymentDto.setUserEmail(payment.getUserEmail());
-
-        //Add surcharge breakdown
-        paymentDto.setBaseFee(payment.getBaseFee());
-        paymentDto.setSurchargeFee(payment.getSurchargeFee());
-        paymentDto.setSurchargeReason(payment.getSurchargeReason());
-
-        return paymentDto;
+        return toDTO(payment);
     }
 
 }

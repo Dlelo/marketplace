@@ -1,10 +1,12 @@
 package com.example.marketplace.service;
 
 import com.example.marketplace.dto.*;
+import com.example.marketplace.model.Agent;
 import com.example.marketplace.model.HomeOwner;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.model.Role;
 import com.example.marketplace.model.User;
+import com.example.marketplace.repository.AgentRepository;
 import com.example.marketplace.repository.HomeOwnerRepository;
 import com.example.marketplace.repository.HouseHelpRepository;
 import com.example.marketplace.repository.RoleRepository;
@@ -30,6 +32,7 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final HouseHelpRepository houseHelpRepository;
     private final HomeOwnerRepository homeOwnerRepository;
+    private final AgentRepository agentRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UserResponseDTO registerUser(RegisterRequest dto, String roleName) {
@@ -134,6 +137,15 @@ public class UserService {
                 homeOwner.setHomeLocation(null);
                 homeOwnerRepository.save(homeOwner);
             }
+        } else if (newRole.getName().equalsIgnoreCase("AGENT")) {
+            if (agentRepository.findByUser(user).isEmpty()) {
+                Agent agent = new Agent();
+                agent.setUser(user);
+                agent.setFullName(user.getName());
+                agent.setEmail(user.getEmail());
+                agent.setPhoneNumber(user.getPhoneNumber());
+                agentRepository.save(agent);
+            }
         }
 
         existingRoles.add(newRole);
@@ -157,10 +169,21 @@ public class UserService {
 
         boolean wantsHouseHelp = hasRole(requestedRoles, "HOUSEHELP");
         boolean wantsHomeOwner = hasRole(requestedRoles, "HOMEOWNER");
-
+        boolean wantsAgent = hasRole(requestedRoles, "AGENT");
 
         if (wantsHouseHelp && wantsHomeOwner) {
             throw new RuntimeException("User cannot be HOUSEHELP and HOMEOWNER at the same time");
+        }
+
+        if (wantsAgent) {
+            agentRepository.findByUser(user).orElseGet(() -> {
+                Agent agent = new Agent();
+                agent.setUser(user);
+                agent.setFullName(user.getName());
+                agent.setEmail(user.getEmail());
+                agent.setPhoneNumber(user.getPhoneNumber());
+                return agentRepository.save(agent);
+            });
         }
 
         // =========================

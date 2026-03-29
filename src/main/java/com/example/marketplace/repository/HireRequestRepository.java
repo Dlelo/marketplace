@@ -1,6 +1,7 @@
 package com.example.marketplace.repository;
 
 import com.example.marketplace.dto.HouseHelpFilterDTO;
+import com.example.marketplace.enums.RequestStatus;
 import com.example.marketplace.model.HireRequest;
 import com.example.marketplace.model.HouseHelp;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,7 @@ import java.util.List;
 public interface HireRequestRepository extends JpaRepository<HireRequest, Long> {
     List<HireRequest> findByHouseHelp_Id(Long houseHelpId);
     List<HireRequest> findByHomeOwner_Id(Long homeOwnerUserId);
+    long countByStatus(RequestStatus status);
 
     interface HouseHelpCustomRepository {
 

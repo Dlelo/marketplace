@@ -24,6 +24,8 @@ public class PaymentResponseDTO {
     private Double surchargeFee;
     private String surchargeReason;
 
+    private boolean archived;
+
     public boolean hasSurcharge() {
         return surchargeFee != null && surchargeFee > 0;
     }

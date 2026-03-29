@@ -12,4 +12,18 @@ public class UserResponseDTO {
     private Set<String> roles;
     private HouseHelpResponseDTO houseHelp;
     private HomeOwnerUpdateDTO homeOwner;
+    private AgentProfileDTO agentProfile;
+
+    @Data
+    public static class AgentProfileDTO {
+        private Long id;
+        private String fullName;
+        private String phoneNumber;
+        private String email;
+        private String nationalId;
+        private String locationOfOperation;
+        private String homeLocation;
+        private String houseNumber;
+        private boolean verified;
+    }
 }

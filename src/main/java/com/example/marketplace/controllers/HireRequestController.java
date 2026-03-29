@@ -58,7 +58,7 @@ public class HireRequestController {
     }
 
     @PutMapping("/{id}/status")
-    @PreAuthorize("hasRole('HOUSEHELP')")
+    @PreAuthorize("hasAnyRole('HOUSEHELP','ADMIN','AGENT','SECURITY')")
     public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestBody RequestStatus status) {
         hireRequestService.updateStatus(id, status);
         return ResponseEntity.noContent().build();

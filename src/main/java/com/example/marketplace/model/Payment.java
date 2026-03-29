@@ -43,6 +43,8 @@ public class Payment {
     @JsonIgnoreProperties({"user"})
     private Agent earningAgent;
 
+    private boolean archived = false;
+
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {

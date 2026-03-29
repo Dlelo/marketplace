@@ -2,14 +2,20 @@ package com.example.marketplace.service;
 
 import com.example.marketplace.dto.AgentUpdateDTO;
 import com.example.marketplace.dto.AgentUpdateResponseDTO;
+import com.example.marketplace.dto.UserResponseDTO;
 import com.example.marketplace.model.Agent;
 import com.example.marketplace.model.HouseHelp;
+import com.example.marketplace.model.Role;
+import com.example.marketplace.model.User;
 import com.example.marketplace.repository.AgentRepository;
 import com.example.marketplace.repository.HouseHelpRepository;
+import com.example.marketplace.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +25,39 @@ import java.util.List;
 public class AgentService {
     private final AgentRepository agentRepository;
     private final HouseHelpRepository houseHelpRepository;
+    private final UserRepository userRepository;
 
     public Page<Agent> getAllAgents(Pageable pageable) {
         return agentRepository.findAll(pageable);
+    }
+
+    public Page<UserResponseDTO> getUsersWithAgentRole(Pageable pageable) {
+        return userRepository.findDistinctByRoles_Name("AGENT", pageable)
+                .map(this::toUserDTO);
+    }
+
+    private UserResponseDTO toUserDTO(User user) {
+        UserResponseDTO dto = new UserResponseDTO();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setPhoneNumber(user.getPhoneNumber());
+        dto.setRoles(user.getRoles().stream().map(Role::getName).collect(java.util.stream.Collectors.toSet()));
+        // attach agent profile if it exists
+        agentRepository.findByUser(user).ifPresent(agent -> {
+            UserResponseDTO.AgentProfileDTO profile = new UserResponseDTO.AgentProfileDTO();
+            profile.setId(agent.getId());
+            profile.setFullName(agent.getFullName());
+            profile.setPhoneNumber(agent.getPhoneNumber());
+            profile.setEmail(agent.getEmail());
+            profile.setNationalId(agent.getNationalId());
+            profile.setLocationOfOperation(agent.getLocationOfOperation());
+            profile.setHomeLocation(agent.getHomeLocation());
+            profile.setHouseNumber(agent.getHouseNumber());
+            profile.setVerified(agent.isVerified());
+            dto.setAgentProfile(profile);
+        });
+        return dto;
     }
 
     public AgentUpdateResponseDTO updateAgent(Long id, AgentUpdateDTO dto) {
