@@ -5,6 +5,7 @@ import com.example.marketplace.dto.PaymentResponseDTO;
 import com.example.marketplace.dto.UserResponseDTO;
 import com.example.marketplace.enums.PaymentStatus;
 import com.example.marketplace.model.Agent;
+import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.model.Payment;
 import com.example.marketplace.model.Role;
 import com.example.marketplace.model.User;
@@ -111,6 +112,15 @@ public class PaymentService {
             }
 
             payment.setStatus(PaymentStatus.SUCCESS);
+
+            // Calculate 10% agent commission if househelp has an agent
+            HouseHelp houseHelp = payment.getUser().getHouseHelp();
+            if (houseHelp != null && houseHelp.getAgent() != null) {
+                double commission = (payment.getBaseFee() != null ? payment.getBaseFee() : payment.getAmount()) * 0.10;
+                payment.setAgentCommission(commission);
+                payment.setEarningAgent(houseHelp.getAgent());
+            }
+
             subscriptionService.handleSuccessfulPayment(payment.getUser().getEmail(), payment);
         } else {
             payment.setStatus(PaymentStatus.FAILED);

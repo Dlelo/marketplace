@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -110,5 +111,15 @@ public class HouseHelp {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private HiringStatus hiringStatus = HiringStatus.AVAILABLE;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agent_id")
+    @JsonIgnoreProperties({"houseHelp", "user"})
+    private Agent agent;
+
+    @ElementCollection
+    @CollectionTable(name = "house_help_documents", joinColumns = @JoinColumn(name = "house_help_id"))
+    @Column(name = "document_url")
+    private List<String> additionalDocuments = new ArrayList<>();
 
 }

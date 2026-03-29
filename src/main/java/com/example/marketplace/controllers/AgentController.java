@@ -37,4 +37,14 @@ public class AgentController {
     ) {
         return ResponseEntity.ok(agentService.updateAgent(id, dto));
     }
+
+    @PutMapping("/{agentId}/househelps/{househelpId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'AGENT')")
+    public ResponseEntity<Void> assignHouseHelpToAgent(
+            @PathVariable Long agentId,
+            @PathVariable Long househelpId
+    ) {
+        agentService.assignHouseHelpToAgent(agentId, househelpId);
+        return ResponseEntity.ok().build();
+    }
 }

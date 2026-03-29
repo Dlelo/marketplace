@@ -41,4 +41,5 @@ public class HouseHelpUpdateDTO {
     private String availability;
     private String experienceSummary;
     private HiringStatus hiringStatus;
+    private List<String> additionalDocuments;
 }

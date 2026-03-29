@@ -1,6 +1,7 @@
 package com.example.marketplace.dto;
 
 import lombok.Data;
+import java.util.List;
 
 @Data
 public class HomeOwnerUpdateDTO {
@@ -19,4 +20,5 @@ public class HomeOwnerUpdateDTO {
     private HomeOwnerPreferenceUpdateDTO preferences;
     private GeoLocationUpdateDTO pinLocation;
     private Integer maxDistanceKm;
+    private List<String> additionalDocuments;
 }

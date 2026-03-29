@@ -32,6 +32,7 @@ public class HomeOwnerService {
         HomeOwner homeOwner = getHomeOwnerOrThrow(id);
 
         updateBasicDetails(homeOwner, dto);
+        if (dto.getAdditionalDocuments() != null) homeOwner.setAdditionalDocuments(dto.getAdditionalDocuments());
         updatePreferences(homeOwner, dto.getPreferences());
         updatePinLocation(homeOwner, dto.getPinLocation());
 

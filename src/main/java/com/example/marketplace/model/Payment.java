@@ -1,6 +1,7 @@
 package com.example.marketplace.model;
 
 import com.example.marketplace.enums.PaymentStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,6 +35,14 @@ public class Payment {
     private PaymentStatus status;
 
     private LocalDateTime createdAt;
+
+    private Double agentCommission;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "earning_agent_id")
+    @JsonIgnoreProperties({"user"})
+    private Agent earningAgent;
+
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {

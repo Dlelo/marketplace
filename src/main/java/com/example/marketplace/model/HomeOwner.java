@@ -60,4 +60,9 @@ public class HomeOwner {
 
     private Integer maxDistanceKm;
 
+    @ElementCollection
+    @CollectionTable(name = "home_owner_documents", joinColumns = @JoinColumn(name = "home_owner_id"))
+    @Column(name = "document_url")
+    private List<String> additionalDocuments = new ArrayList<>();
+
 }

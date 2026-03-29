@@ -55,6 +55,7 @@ public class HouseHelpService {
         if (dto.getMaxTravelDistanceKm() != null) {
             dto.setMaxTravelDistanceKm(dto.getMaxTravelDistanceKm());
         }
+        if (dto.getAdditionalDocuments() != null) houseHelp.setAdditionalDocuments(dto.getAdditionalDocuments());
         updatePreferences(houseHelp, dto.getPreferences());
         updatePinLocation(houseHelp, dto.getPinLocation());
 

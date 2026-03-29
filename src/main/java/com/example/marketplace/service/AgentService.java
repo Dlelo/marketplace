@@ -3,7 +3,9 @@ package com.example.marketplace.service;
 import com.example.marketplace.dto.AgentUpdateDTO;
 import com.example.marketplace.dto.AgentUpdateResponseDTO;
 import com.example.marketplace.model.Agent;
+import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.repository.AgentRepository;
+import com.example.marketplace.repository.HouseHelpRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AgentService {
     private final AgentRepository agentRepository;
+    private final HouseHelpRepository houseHelpRepository;
 
     public Page<Agent> getAllAgents(Pageable pageable) {
         return agentRepository.findAll(pageable);
@@ -67,6 +70,15 @@ public class AgentService {
         if (agent.getHouseNumber() == null) missing.add("houseNumber");
         if (isBlank(agent.getIdDocument())) missing.add("idDocument");
         return missing;
+    }
+
+    public void assignHouseHelpToAgent(Long agentId, Long househelpId) {
+        Agent agent = agentRepository.findById(agentId)
+                .orElseThrow(() -> new RuntimeException("Agent not found"));
+        HouseHelp houseHelp = houseHelpRepository.findById(househelpId)
+                .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
+        houseHelp.setAgent(agent);
+        houseHelpRepository.save(houseHelp);
     }
 
     private boolean isBlank(String value) {
