@@ -1,6 +1,7 @@
 package com.example.marketplace.controllers;
 
 import com.example.marketplace.dto.*;
+import com.example.marketplace.dto.HomeOwnerListDTO;
 import com.example.marketplace.model.HomeOwner;
 import com.example.marketplace.repository.HomeOwnerRepository;
 import com.example.marketplace.service.FileUploadService;
@@ -34,11 +35,11 @@ public class HomeOwnerController {
 
     @PostMapping("/search")
     @PreAuthorize("hasAnyRole('AGENT','ADMIN','SALES','SECURITY')")
-    public ResponseEntity<Page<HomeOwner>> searchHomeOwner(
+    public ResponseEntity<Page<HomeOwnerListDTO>> searchHomeOwner(
             @RequestBody HomeOwnerFilterDTO filter,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(homeOwnerService.findByFilterAndPage(filter, pageable));
+        return ResponseEntity.ok(homeOwnerService.findListByFilterAndPage(filter, pageable));
     }
 
 

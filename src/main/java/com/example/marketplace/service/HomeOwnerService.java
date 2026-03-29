@@ -8,9 +8,13 @@ import com.example.marketplace.repository.HomeOwnerRepository;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.stream.Collectors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -212,6 +216,26 @@ public class HomeOwnerService {
 
     public Page<HomeOwner> findByFilterAndPage(HomeOwnerFilterDTO filter, Pageable pageable) {
         return homeOwnerRepository.findAll(buildSpecification(filter), pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<HomeOwnerListDTO> findListByFilterAndPage(HomeOwnerFilterDTO filter, Pageable pageable) {
+        Page<HomeOwner> page = homeOwnerRepository.findAll(buildSpecification(filter), pageable);
+        List<HomeOwnerListDTO> dtos = page.getContent().stream().map(ho -> {
+            HomeOwnerListDTO dto = new HomeOwnerListDTO();
+            dto.setId(ho.getId());
+            dto.setActive(ho.isActive());
+            if (ho.getUser() != null) {
+                HomeOwnerListDTO.UserSummary u = new HomeOwnerListDTO.UserSummary();
+                u.setId(ho.getUser().getId());
+                u.setName(ho.getUser().getName());
+                u.setEmail(ho.getUser().getEmail());
+                u.setPhoneNumber(ho.getUser().getPhoneNumber());
+                dto.setUser(u);
+            }
+            return dto;
+        }).collect(Collectors.toList());
+        return new PageImpl<>(dtos, pageable, page.getTotalElements());
     }
 
     private Specification<HomeOwner> buildSpecification(HomeOwnerFilterDTO filter) {

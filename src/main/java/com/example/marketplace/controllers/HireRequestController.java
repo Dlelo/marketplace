@@ -1,6 +1,7 @@
 package com.example.marketplace.controllers;
 
 import com.example.marketplace.dto.HireRequestDTO;
+import com.example.marketplace.dto.HireRequestListDTO;
 import com.example.marketplace.dto.HireRequestResponseDTO;
 import com.example.marketplace.dto.HouseHelpVerificationResponseDTO;
 import com.example.marketplace.enums.RequestStatus;
@@ -30,7 +31,8 @@ public class HireRequestController {
     private final HouseHelpService houseHelpService;
 
     @GetMapping
-    public ResponseEntity<Page<HireRequest>> getAllHireRequests(Pageable pageable) {
+    @PreAuthorize("hasAnyRole('ADMIN','AGENT','SECURITY','SALES')")
+    public ResponseEntity<Page<HireRequestListDTO>> getAllHireRequests(Pageable pageable) {
         return ResponseEntity.ok(hireRequestService.getAllHireRequests(pageable));
     }
 

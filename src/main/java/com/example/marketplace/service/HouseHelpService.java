@@ -8,9 +8,13 @@ import com.example.marketplace.repository.HouseHelpRepository;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.stream.Collectors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +88,26 @@ public class HouseHelpService {
 
     public Page<HouseHelp> findByFilterAndPage(HouseHelpFilterDTO filter, Pageable pageable) {
         return houseHelpRepository.findAll(buildSpecification(filter), pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<HouseHelpListDTO> findListByFilterAndPage(HouseHelpFilterDTO filter, Pageable pageable) {
+        Page<HouseHelp> page = houseHelpRepository.findAll(buildSpecification(filter), pageable);
+        List<HouseHelpListDTO> dtos = page.getContent().stream().map(hh -> {
+            HouseHelpListDTO dto = new HouseHelpListDTO();
+            dto.setId(hh.getId());
+            dto.setActive(hh.isActive());
+            if (hh.getUser() != null) {
+                HouseHelpListDTO.UserSummary u = new HouseHelpListDTO.UserSummary();
+                u.setId(hh.getUser().getId());
+                u.setName(hh.getUser().getName());
+                u.setEmail(hh.getUser().getEmail());
+                u.setPhoneNumber(hh.getUser().getPhoneNumber());
+                dto.setUser(u);
+            }
+            return dto;
+        }).collect(Collectors.toList());
+        return new PageImpl<>(dtos, pageable, page.getTotalElements());
     }
 
     private Specification<HouseHelp> buildSpecification(HouseHelpFilterDTO filter) {

@@ -1,6 +1,7 @@
 package com.example.marketplace.controllers;
 
 import com.example.marketplace.dto.*;
+import com.example.marketplace.dto.HouseHelpListDTO;
 import com.example.marketplace.model.HomeOwner;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.repository.HouseHelpRepository;
@@ -30,11 +31,11 @@ public class HouseHelpController {
 
     @PostMapping("/search")
     @PreAuthorize("hasAnyRole('AGENT','HOMEOWNER','ADMIN','SALES','SECURITY')")
-    public ResponseEntity<Page<HouseHelp>> searchHouseHelps(
+    public ResponseEntity<Page<HouseHelpListDTO>> searchHouseHelps(
             @RequestBody HouseHelpFilterDTO filter,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(houseHelpService.findByFilterAndPage(filter, pageable));
+        return ResponseEntity.ok(houseHelpService.findListByFilterAndPage(filter, pageable));
     }
 
     @PutMapping("/verify/{houseHelpId}")

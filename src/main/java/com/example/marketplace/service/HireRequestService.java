@@ -1,6 +1,7 @@
 package com.example.marketplace.service;
 
 import com.example.marketplace.dto.HireRequestDTO;
+import com.example.marketplace.dto.HireRequestListDTO;
 import com.example.marketplace.dto.HireRequestResponseDTO;
 import com.example.marketplace.enums.RequestStatus;
 import com.example.marketplace.mapper.HireRequestMapper;
@@ -14,8 +15,10 @@ import com.example.marketplace.repository.HouseHelpRepository;
 import com.example.marketplace.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -92,8 +95,39 @@ public class HireRequestService {
     /**
      * Get paginated list of all hire requests.
      */
-    public Page<HireRequest> getAllHireRequests(Pageable pageable) {
-        return hireRequestRepository.findAll(pageable);
+    @Transactional(readOnly = true)
+    public Page<HireRequestListDTO> getAllHireRequests(Pageable pageable) {
+        Page<HireRequest> page = hireRequestRepository.findAll(pageable);
+        List<HireRequestListDTO> dtos = page.getContent().stream().map(hr -> {
+            HireRequestListDTO dto = new HireRequestListDTO();
+            dto.setId(hr.getId());
+            dto.setStatus(hr.getStatus());
+            dto.setPaid(hr.isPaid());
+            dto.setCreatedAt(hr.getCreatedAt());
+
+            if (hr.getHouseHelp() != null) {
+                HireRequestListDTO.HouseHelpRef hhRef = new HireRequestListDTO.HouseHelpRef();
+                hhRef.setId(hr.getHouseHelp().getId());
+                if (hr.getHouseHelp().getUser() != null) {
+                    hhRef.setName(hr.getHouseHelp().getUser().getName());
+                }
+                dto.setHouseHelp(hhRef);
+            }
+
+            if (hr.getHomeOwner() != null) {
+                HireRequestListDTO.HomeOwnerRef hoRef = new HireRequestListDTO.HomeOwnerRef();
+                hoRef.setId(hr.getHomeOwner().getId());
+                if (hr.getHomeOwner().getUser() != null) {
+                    HireRequestListDTO.UserRef userRef = new HireRequestListDTO.UserRef();
+                    userRef.setId(hr.getHomeOwner().getUser().getId());
+                    userRef.setName(hr.getHomeOwner().getUser().getName());
+                    hoRef.setUser(userRef);
+                }
+                dto.setHomeOwner(hoRef);
+            }
+            return dto;
+        }).collect(Collectors.toList());
+        return new PageImpl<>(dtos, pageable, page.getTotalElements());
     }
 
     // -------------------- 🔹 Private Helpers -------------------- //

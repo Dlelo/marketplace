@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.stream.Collectors;
 
@@ -31,6 +32,7 @@ public class AgentService {
         return agentRepository.findAll(pageable);
     }
 
+    @Transactional(readOnly = true)
     public Page<UserResponseDTO> getUsersWithAgentRole(Pageable pageable) {
         return userRepository.findDistinctByRoles_Name("AGENT", pageable)
                 .map(this::toUserDTO);

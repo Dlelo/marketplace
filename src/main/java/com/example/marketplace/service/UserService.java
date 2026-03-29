@@ -374,9 +374,36 @@ public class UserService {
         dto.setId(homeOwner.getId());
         dto.setNationalId(homeOwner.getNationalId());
         dto.setHomeLocation(homeOwner.getHomeLocation());
+        dto.setHouseType(homeOwner.getHouseType());
+        dto.setNumberOfRooms(homeOwner.getNumberOfRooms());
+        dto.setNumberOfDependents(homeOwner.getNumberOfDependents());
         dto.setPhoneNumber(homeOwner.getPhoneNumber());
         dto.setNationalIdDocument(homeOwner.getNationalIdDocument());
         dto.setProfilePictureDocument(homeOwner.getProfilePictureDocument());
+        dto.setAdditionalDocuments(homeOwner.getAdditionalDocuments());
+
+        if (homeOwner.getPreferences() != null) {
+            var p = homeOwner.getPreferences();
+            HomeOwnerPreferenceUpdateDTO pref = new HomeOwnerPreferenceUpdateDTO();
+            pref.setHouseHelpType(p.getHouseHelpType());
+            pref.setMinExperience(p.getMinExperience());
+            pref.setLocation(p.getLocation());
+            pref.setPreferredSkills(p.getPreferredSkills());
+            pref.setPreferredLanguages(p.getPreferredLanguages());
+            pref.setMinMatchScore(p.getMinMatchScore());
+            pref.setChildrenAgeRanges(p.getChildrenAgeRanges());
+            pref.setNumberOfChildren(p.getNumberOfChildren());
+            pref.setRequiredServices(p.getRequiredServices());
+            pref.setHasPets(p.getHasPets());
+            pref.setReligionPreference(p.getReligionPreference());
+            pref.setRequiresSecurityCleared(p.getRequiresSecurityCleared());
+            pref.setPreferredMinAge(p.getPreferredMinAge());
+            pref.setPreferredMaxAge(p.getPreferredMaxAge());
+            pref.setMinSalary(p.getMinSalary());
+            pref.setMaxSalary(p.getMaxSalary());
+            dto.setPreferences(pref);
+        }
+
         return dto;
     }
 
