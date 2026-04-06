@@ -52,7 +52,7 @@ public class DiscoverService {
                         toCard(h),
                         calculateMatch(pref, h)
                 ))
-                .filter(m -> m.getMatchScore() >= pref.getMinMatchScore())
+                .filter(m -> m.getMatchScore() >= (pref.getMinMatchScore() != null ? pref.getMinMatchScore() : 50))
                 .sorted((a, b) -> b.getMatchScore() - a.getMatchScore())
                 .limit(6)
                 .toList();
