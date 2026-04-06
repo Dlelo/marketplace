@@ -1,9 +1,12 @@
 package com.example.marketplace.service;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
@@ -17,6 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DarajaService {
 
+    private static final Logger log = LoggerFactory.getLogger(DarajaService.class);
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${daraja.consumerKey}")
@@ -41,9 +45,12 @@ public class DarajaService {
      * Generate OAuth token
      */
     public String generateAccessToken() {
+        if (consumerKey == null || consumerKey.isBlank() || consumerSecret == null || consumerSecret.isBlank()) {
+            throw new RuntimeException("Daraja credentials not configured. Set DARAJA_CONSUMER_KEY and DARAJA_CONSUMER_SECRET.");
+        }
+
         String url = baseUrl + "/oauth/v1/generate?grant_type=client_credentials";
 
-        // Build Basic Auth header
         String auth = consumerKey + ":" + consumerSecret;
         String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
 
@@ -52,12 +59,16 @@ public class DarajaService {
 
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
-        ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, request, Map.class);
-
-        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-            return (String) response.getBody().get("access_token");
+        try {
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, request, Map.class);
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                return (String) response.getBody().get("access_token");
+            }
+            throw new RuntimeException("Failed to get access token from Daraja");
+        } catch (HttpClientErrorException e) {
+            log.error("Daraja OAuth error {}: {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("Daraja auth failed (" + e.getStatusCode() + "): " + e.getResponseBodyAsString());
         }
-        throw new RuntimeException("Failed to get access token from Daraja");
     }
 
     /**
@@ -106,11 +117,16 @@ public class DarajaService {
 
         HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(request, headers);
 
-        ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Map.class);
-
-        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-            return response.getBody();
+        try {
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Map.class);
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                log.info("STK Push initiated: {}", response.getBody());
+                return response.getBody();
+            }
+            throw new RuntimeException("STK Push returned empty response");
+        } catch (HttpClientErrorException e) {
+            log.error("STK Push error {}: {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("STK Push failed (" + e.getStatusCode() + "): " + e.getResponseBodyAsString());
         }
-        throw new RuntimeException("Failed to initiate STK Push request");
     }
 }
