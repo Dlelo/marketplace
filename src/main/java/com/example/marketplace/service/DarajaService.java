@@ -41,6 +41,9 @@ public class DarajaService {
     @Value("${daraja.callback-url}")
     private String callbackUrl;
 
+    @Value("${daraja.transactionType:CustomerBuyGoodsOnline}")
+    private String transactionType;
+
     /**
      * Generate OAuth token
      */
@@ -105,7 +108,7 @@ public class DarajaService {
         request.put("BusinessShortCode", businessShortCode);
         request.put("Password", password);
         request.put("Timestamp", timestamp);
-        request.put("TransactionType", "CustomerBuyGoodsOnline");
+        request.put("TransactionType", transactionType);
         request.put("Amount", (long) amount);
         request.put("PartyA", phoneNumber);
         request.put("PartyB", businessShortCode);
