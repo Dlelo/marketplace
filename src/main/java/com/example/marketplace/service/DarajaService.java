@@ -94,8 +94,8 @@ public class DarajaService {
         request.put("BusinessShortCode", businessShortCode);
         request.put("Password", password);
         request.put("Timestamp", timestamp);
-        request.put("TransactionType", "CustomerPayBillOnline");
-        request.put("Amount", amount);
+        request.put("TransactionType", "CustomerBuyGoodsOnline");
+        request.put("Amount", (long) amount);
         request.put("PartyA", phoneNumber);
         request.put("PartyB", businessShortCode);
         request.put("PhoneNumber", phoneNumber);

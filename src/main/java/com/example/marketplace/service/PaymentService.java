@@ -12,15 +12,11 @@ import com.example.marketplace.model.User;
 import com.example.marketplace.repository.PaymentRepository;
 import com.example.marketplace.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.jdbc.Expectation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,22 +39,21 @@ public class PaymentService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
 
-        String accountReference = "Subscription-" + email;
+        String accountReference = "YayaConnect";
         String transactionDesc = "Subscription Payment";
 
-//        TODO Bring back the below once we go live
-//        Map<String, Object> response = darajaService.lipaNaMpesa(phoneNumber, amount, accountReference, transactionDesc);
+        Map<String, Object> stkResponse = darajaService.lipaNaMpesa(phoneNumber, amount, accountReference, transactionDesc);
 
-        // Save pending payment
-        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        String transactionId = phoneNumber + "-" + today;
+        String checkoutRequestId = (String) stkResponse.get("CheckoutRequestID");
+
+        // Save pending payment keyed by CheckoutRequestID so the callback can find it
         Payment payment = Payment.builder()
                 .user(user)
-                .transactionId(transactionId)
+                .transactionId(checkoutRequestId)
                 .amount(amount)
-                .baseFee(amount)           // For subscriptions, baseFee = amount
-                .surchargeFee(0.0)         // No surcharge for subscriptions
-                .surchargeReason(null)     // No surcharge reason
+                .baseFee(amount)
+                .surchargeFee(0.0)
+                .surchargeReason(null)
                 .provider("M-PESA")
                 .status(PaymentStatus.PENDING)
                 .createdAt(LocalDateTime.now())
@@ -66,13 +61,12 @@ public class PaymentService {
 
         paymentRepository.save(payment);
 
-//        return response;
-        Map<String, Object> mutedResponse = new HashMap<>();
-        mutedResponse.put("message", "Payment request received. Awaiting confirmation.");
-        mutedResponse.put("checkoutRequestId", null);
-        mutedResponse.put("status", "PENDING");
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "STK Push sent. Please check your phone.");
+        response.put("checkoutRequestId", checkoutRequestId);
+        response.put("status", "PENDING");
 
-        return mutedResponse;
+        return response;
     }
 
     /**
