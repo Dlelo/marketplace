@@ -53,4 +53,6 @@ public interface HouseHelpRepository extends JpaRepository<HouseHelp, Long>, Jpa
     """)
     List<HouseHelp> findAllActive();
 
+    List<HouseHelp> findByAgency_Id(Long agencyId);
+
 }

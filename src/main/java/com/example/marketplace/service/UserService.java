@@ -91,6 +91,14 @@ public class UserService {
                 homeOwner.setUser(savedUser);
                 homeOwnerRepository.save(homeOwner);
             }
+            case "AGENT" -> {
+                Agent agent = new Agent();
+                agent.setUser(savedUser);
+                agent.setFullName(savedUser.getName());
+                agent.setEmail(savedUser.getEmail());
+                agent.setPhoneNumber(savedUser.getPhoneNumber());
+                agentRepository.save(agent);
+            }
         }
 
         return toUserResponseDTO(savedUser);
@@ -268,6 +276,24 @@ public class UserService {
                 });
     }
 
+    public List<UserResponseDTO> lookupUsers(String q) {
+        return userRepository.lookupByPhoneOrName(q.trim(),
+                        org.springframework.data.domain.PageRequest.of(0, 10))
+                .map(user -> {
+                    UserResponseDTO dto = new UserResponseDTO();
+                    dto.setId(user.getId());
+                    dto.setPhoneNumber(user.getPhoneNumber());
+                    dto.setEmail(user.getEmail());
+                    dto.setName(user.getName());
+                    dto.setRoles(user.getRoles()
+                            .stream()
+                            .map(Role::getName)
+                            .collect(Collectors.toSet()));
+                    return dto;
+                })
+                .getContent();
+    }
+
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -306,6 +332,23 @@ public class UserService {
 
         dto.setHouseHelp(mapToHouseHelpDTO(user.getHouseHelp()));
         dto.setHomeOwner(mapToHomeOwnerDTO(user.getHomeOwner()));
+
+        // Include agent profile when the user has AGENT role
+        agentRepository.findByUser(user).ifPresent(agent -> {
+            UserResponseDTO.AgentProfileDTO profile = new UserResponseDTO.AgentProfileDTO();
+            profile.setId(agent.getId());
+            profile.setFullName(agent.getFullName());
+            profile.setPhoneNumber(agent.getPhoneNumber());
+            profile.setEmail(agent.getEmail());
+            profile.setNationalId(agent.getNationalId());
+            profile.setLocationOfOperation(agent.getLocationOfOperation());
+            profile.setHomeLocation(agent.getHomeLocation());
+            profile.setHouseNumber(agent.getHouseNumber());
+            profile.setVerified(agent.isVerified());
+            profile.setAgentRole(agent.getAgentRole() != null ? agent.getAgentRole().name() : "ADMIN");
+            dto.setAgentProfile(profile);
+        });
+
         return dto;
     }
 

@@ -1,31 +1,23 @@
 package com.example.marketplace.service;
 
-import com.example.marketplace.dto.AgentUpdateDTO;
-import com.example.marketplace.dto.AgentUpdateResponseDTO;
-import com.example.marketplace.dto.UserResponseDTO;
-import com.example.marketplace.model.Agent;
-import com.example.marketplace.model.HouseHelp;
-import com.example.marketplace.model.Role;
-import com.example.marketplace.model.User;
-import com.example.marketplace.repository.AgentRepository;
-import com.example.marketplace.repository.HouseHelpRepository;
-import com.example.marketplace.repository.UserRepository;
+import com.example.marketplace.dto.*;
+import com.example.marketplace.enums.AgentRole;
+import com.example.marketplace.model.*;
+import com.example.marketplace.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.stream.Collectors;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AgentService {
     private final AgentRepository agentRepository;
-    private final HouseHelpRepository houseHelpRepository;
     private final UserRepository userRepository;
 
     public Page<Agent> getAllAgents(Pageable pageable) {
@@ -44,26 +36,15 @@ public class AgentService {
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());
         dto.setPhoneNumber(user.getPhoneNumber());
-        dto.setRoles(user.getRoles().stream().map(Role::getName).collect(java.util.stream.Collectors.toSet()));
-        // attach agent profile if it exists
+        dto.setRoles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()));
         agentRepository.findByUser(user).ifPresent(agent -> {
-            UserResponseDTO.AgentProfileDTO profile = new UserResponseDTO.AgentProfileDTO();
-            profile.setId(agent.getId());
-            profile.setFullName(agent.getFullName());
-            profile.setPhoneNumber(agent.getPhoneNumber());
-            profile.setEmail(agent.getEmail());
-            profile.setNationalId(agent.getNationalId());
-            profile.setLocationOfOperation(agent.getLocationOfOperation());
-            profile.setHomeLocation(agent.getHomeLocation());
-            profile.setHouseNumber(agent.getHouseNumber());
-            profile.setVerified(agent.isVerified());
-            dto.setAgentProfile(profile);
+            dto.setAgentProfile(buildAgentProfile(agent));
         });
         return dto;
     }
 
     public AgentUpdateResponseDTO updateAgent(Long id, AgentUpdateDTO dto) {
-        Agent agent =agentRepository.findById(id)
+        Agent agent = agentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Agent not found"));
 
         if (dto.getFullName() != null) agent.setFullName(dto.getFullName());
@@ -74,20 +55,22 @@ public class AgentService {
         if (dto.getLocationOfOperation() != null) agent.setLocationOfOperation(dto.getLocationOfOperation());
         if (dto.getHouseNumber() != null) agent.setHouseNumber(dto.getHouseNumber());
         if (dto.getIdDocument() != null) agent.setIdDocument(dto.getIdDocument());
+        if (dto.getAgentRole() != null) {
+            try {
+                agent.setAgentRole(AgentRole.valueOf(dto.getAgentRole().toUpperCase()));
+            } catch (IllegalArgumentException ignored) {}
+        }
 
         Agent updated = agentRepository.save(agent);
-
         List<String> missingFields = getMissingFields(updated);
-
         return new AgentUpdateResponseDTO(updated, missingFields);
     }
 
     public Agent verifyAgent(Long id) {
-        Agent agent =agentRepository.findById(id)
+        Agent agent = agentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Agent not found"));
 
         List<String> missingFields = getMissingFields(agent);
-
         if (!missingFields.isEmpty()) {
             throw new RuntimeException("Profile incomplete. Missing fields: " + String.join(", ", missingFields));
         }
@@ -96,9 +79,48 @@ public class AgentService {
         return agentRepository.save(agent);
     }
 
+    /** Get a single agent's profile (returns the linked user's full DTO) */
+    public UserResponseDTO getAgentProfile(Long agentId) {
+        Agent agent = agentRepository.findById(agentId)
+                .orElseThrow(() -> new RuntimeException("Agent not found"));
+        User user = agent.getUser();
+
+        UserResponseDTO dto = new UserResponseDTO();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setPhoneNumber(user.getPhoneNumber());
+        dto.setRoles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()));
+        dto.setAgentProfile(buildAgentProfile(agent));
+        return dto;
+    }
+
+    // ─────────────────────────────────────────────────
+    //  Private helpers
+    // ─────────────────────────────────────────────────
+
+    private UserResponseDTO.AgentProfileDTO buildAgentProfile(Agent agent) {
+        UserResponseDTO.AgentProfileDTO profile = new UserResponseDTO.AgentProfileDTO();
+        profile.setId(agent.getId());
+        profile.setFullName(agent.getFullName());
+        profile.setPhoneNumber(agent.getPhoneNumber());
+        profile.setEmail(agent.getEmail());
+        profile.setNationalId(agent.getNationalId());
+        profile.setLocationOfOperation(agent.getLocationOfOperation());
+        profile.setHomeLocation(agent.getHomeLocation());
+        profile.setHouseNumber(agent.getHouseNumber());
+        profile.setVerified(agent.isVerified());
+        profile.setAgentRole(agent.getAgentRole() != null ? agent.getAgentRole().name() : AgentRole.ADMIN.name());
+        if (agent.getAgency() != null) {
+            profile.setAgencyId(agent.getAgency().getId());
+            profile.setAgencyName(agent.getAgency().getName());
+            profile.setAgencyVerified(agent.getAgency().isVerified());
+        }
+        return profile;
+    }
+
     private List<String> getMissingFields(Agent agent) {
         List<String> missing = new ArrayList<>();
-
         if (isBlank(agent.getFullName())) missing.add("fullName");
         if (isBlank(agent.getNationalId())) missing.add("nationalId");
         if (isBlank(agent.getPhoneNumber())) missing.add("phoneNumber");
@@ -108,15 +130,6 @@ public class AgentService {
         if (agent.getHouseNumber() == null) missing.add("houseNumber");
         if (isBlank(agent.getIdDocument())) missing.add("idDocument");
         return missing;
-    }
-
-    public void assignHouseHelpToAgent(Long agentId, Long househelpId) {
-        Agent agent = agentRepository.findById(agentId)
-                .orElseThrow(() -> new RuntimeException("Agent not found"));
-        HouseHelp houseHelp = houseHelpRepository.findById(househelpId)
-                .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
-        houseHelp.setAgent(agent);
-        houseHelpRepository.save(houseHelp);
     }
 
     private boolean isBlank(String value) {

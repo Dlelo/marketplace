@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -25,6 +27,13 @@ public class UserController {
     @GetMapping("")
     public ResponseEntity<Page<UserResponseDTO>> listUsers(Pageable pageable) {
         return ResponseEntity.ok(userService.getAllUsers(pageable));
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','AGENT','SALES','SECURITY')")
+    @GetMapping("/lookup")
+    public ResponseEntity<List<UserResponseDTO>> lookupUsers(@RequestParam String q) {
+        if (q == null || q.isBlank()) return ResponseEntity.ok(List.of());
+        return ResponseEntity.ok(userService.lookupUsers(q));
     }
 
     @PostMapping("/search")

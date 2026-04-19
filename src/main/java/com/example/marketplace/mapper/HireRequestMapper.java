@@ -21,6 +21,19 @@ public class HireRequestMapper {
         dto.setHomeOwnerId(entity.getHomeOwner().getId());
         dto.setHouseHelpId(entity.getHouseHelp().getId());
         dto.setStatus(entity.getStatus());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setStartDate(entity.getStartDate());
+        dto.setMessage(entity.getMessage());
+
+        if (entity.getHouseHelp() != null) {
+            dto.setHouseHelpName(entity.getHouseHelp().getName());
+        }
+
+        if (entity.getHomeOwner() != null && entity.getHomeOwner().getUser() != null) {
+            dto.setHomeOwnerName(entity.getHomeOwner().getUser().getName());
+            dto.setHomeOwnerUserId(entity.getHomeOwner().getUser().getId());
+        }
+
         return dto;
     }
 }

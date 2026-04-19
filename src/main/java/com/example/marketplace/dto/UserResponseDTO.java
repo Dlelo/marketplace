@@ -25,5 +25,10 @@ public class UserResponseDTO {
         private String homeLocation;
         private String houseNumber;
         private boolean verified;
+        /** ADMIN or EMPLOYEE */
+        private String agentRole;
+        private Long agencyId;
+        private String agencyName;
+        private Boolean agencyVerified;
     }
 }

@@ -29,4 +29,7 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
         WHERE u.id = :id
     """)
     Optional<User> findByIdWithRelations(@Param("id") Long id);
+
+    @Query("SELECT u FROM User u WHERE u.phoneNumber = :q OR LOWER(u.name) LIKE LOWER(CONCAT('%', :q, '%'))")
+    Page<User> lookupByPhoneOrName(@Param("q") String q, Pageable pageable);
 }

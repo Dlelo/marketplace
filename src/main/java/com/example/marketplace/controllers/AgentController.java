@@ -1,8 +1,6 @@
 package com.example.marketplace.controllers;
 
-import com.example.marketplace.dto.AgentUpdateDTO;
-import com.example.marketplace.dto.AgentUpdateResponseDTO;
-import com.example.marketplace.dto.UserResponseDTO;
+import com.example.marketplace.dto.*;
 import com.example.marketplace.model.Agent;
 import com.example.marketplace.service.AgentService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/agent")
 @RequiredArgsConstructor
-
 public class AgentController {
     private final AgentService agentService;
 
@@ -34,18 +31,14 @@ public class AgentController {
     @PreAuthorize("hasAnyRole('ADMIN', 'AGENT')")
     public ResponseEntity<AgentUpdateResponseDTO> updateAgent(
             @PathVariable Long id,
-            @RequestBody AgentUpdateDTO dto
-    ) {
+            @RequestBody AgentUpdateDTO dto) {
         return ResponseEntity.ok(agentService.updateAgent(id, dto));
     }
 
-    @PutMapping("/{agentId}/househelps/{househelpId}")
+    /** Get a single agent's profile (returns the linked user's full DTO) */
+    @GetMapping("/{id}/profile")
     @PreAuthorize("hasAnyRole('ADMIN', 'AGENT')")
-    public ResponseEntity<Void> assignHouseHelpToAgent(
-            @PathVariable Long agentId,
-            @PathVariable Long househelpId
-    ) {
-        agentService.assignHouseHelpToAgent(agentId, househelpId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<UserResponseDTO> getAgentProfile(@PathVariable Long id) {
+        return ResponseEntity.ok(agentService.getAgentProfile(id));
     }
 }

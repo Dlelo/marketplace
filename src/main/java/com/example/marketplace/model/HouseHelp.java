@@ -113,9 +113,9 @@ public class HouseHelp {
     private HiringStatus hiringStatus = HiringStatus.AVAILABLE;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "agent_id")
-    @JsonIgnoreProperties({"houseHelp", "user"})
-    private Agent agent;
+    @JoinColumn(name = "agency_id")
+    @JsonIgnoreProperties({"members"})
+    private Agency agency;
 
     @ElementCollection
     @CollectionTable(name = "house_help_documents", joinColumns = @JoinColumn(name = "house_help_id"))

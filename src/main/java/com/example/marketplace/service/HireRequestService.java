@@ -158,6 +158,19 @@ public class HireRequestService {
         dto.setHomeOwnerId(hireRequest.getHomeOwner().getId());
         dto.setHouseHelpId(hireRequest.getHouseHelp().getId());
         dto.setStatus(hireRequest.getStatus());
+        dto.setCreatedAt(hireRequest.getCreatedAt());
+        dto.setStartDate(hireRequest.getStartDate());
+        dto.setMessage(hireRequest.getMessage());
+
+        if (hireRequest.getHouseHelp() != null) {
+            dto.setHouseHelpName(hireRequest.getHouseHelp().getName());
+        }
+
+        if (hireRequest.getHomeOwner() != null && hireRequest.getHomeOwner().getUser() != null) {
+            dto.setHomeOwnerName(hireRequest.getHomeOwner().getUser().getName());
+            dto.setHomeOwnerUserId(hireRequest.getHomeOwner().getUser().getId());
+        }
+
         return dto;
     }
 }

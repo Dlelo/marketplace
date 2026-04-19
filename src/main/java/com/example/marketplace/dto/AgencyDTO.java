@@ -1,17 +1,14 @@
 package com.example.marketplace.dto;
+
 import lombok.Data;
 
+/** Request body for creating or updating an Agency entity. */
 @Data
-public class AgentUpdateDTO {
-    private String agencyName;
-    private String fullName;
+public class AgencyDTO {
+    private String name;
     private String phoneNumber;
     private String email;
-    private String nationalId;
-    private String idDocument;
     private String locationOfOperation;
     private String homeLocation;
     private String houseNumber;
-    /** ADMIN or EMPLOYEE */
-    private String agentRole;
 }

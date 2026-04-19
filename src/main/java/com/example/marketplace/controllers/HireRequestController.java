@@ -67,13 +67,13 @@ public class HireRequestController {
     }
 
     @GetMapping("/househelp/{houseHelpId}")
-    @PreAuthorize("hasRole('HOUSEHELP')")
+    @PreAuthorize("hasAnyRole('HOUSEHELP', 'ADMIN', 'AGENT')")
     public ResponseEntity<List<HireRequestResponseDTO>> getRequestsForHouseHelp(@PathVariable Long houseHelpId) {
         return ResponseEntity.ok(hireRequestService.getRequestsForHouseHelp(houseHelpId));
     }
 
     @GetMapping("/homeowner/{homeOwnerId}")
-    @PreAuthorize("hasRole('HOMEOWNER')")
+    @PreAuthorize("hasAnyRole('HOMEOWNER', 'ADMIN', 'AGENT')")
     public ResponseEntity<List<HireRequestResponseDTO>> getRequestsForHomeOwner(@PathVariable Long homeOwnerId) {
         return ResponseEntity.ok(hireRequestService.findByHomeOwner_Id(homeOwnerId));
     }

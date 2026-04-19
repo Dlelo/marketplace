@@ -1,9 +1,11 @@
 package com.example.marketplace.service;
 
 import com.example.marketplace.dto.*;
+import com.example.marketplace.model.Agent;
 import com.example.marketplace.model.GeoLocation;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.model.HouseHelpPreference;
+import com.example.marketplace.repository.AgentRepository;
 import com.example.marketplace.repository.HouseHelpRepository;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HouseHelpService {
     private final HouseHelpRepository houseHelpRepository;
+    private final AgentRepository agentRepository;
 
     public Page<HouseHelp> getAllHouseHelps(Pageable pageable) {
         return houseHelpRepository.findAll(pageable);
@@ -239,6 +242,19 @@ public class HouseHelpService {
                 .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
 
         houseHelp.setActive(active);
+        return houseHelpRepository.save(houseHelp);
+    }
+
+    @Transactional
+    public HouseHelp assignToAgent(Long houseHelpId, Long agentId) {
+        HouseHelp houseHelp = houseHelpRepository.findById(houseHelpId)
+                .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
+        Agent agent = agentRepository.findById(agentId)
+                .orElseThrow(() -> new RuntimeException("Agent not found"));
+        if (agent.getAgency() == null) {
+            throw new RuntimeException("Agent is not linked to any agency");
+        }
+        houseHelp.setAgency(agent.getAgency());
         return houseHelpRepository.save(houseHelp);
     }
 

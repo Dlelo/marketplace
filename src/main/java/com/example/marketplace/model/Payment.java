@@ -3,6 +3,7 @@ package com.example.marketplace.model;
 import com.example.marketplace.enums.PaymentStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -39,9 +40,9 @@ public class Payment {
     private Double agentCommission;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "earning_agent_id")
-    @JsonIgnoreProperties({"user"})
-    private Agent earningAgent;
+    @JoinColumn(name = "earning_agency_id")
+    @JsonIgnoreProperties({"members"})
+    private Agency earningAgency;
 
     private boolean archived = false;
 

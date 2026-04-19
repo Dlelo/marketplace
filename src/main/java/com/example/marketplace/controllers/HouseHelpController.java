@@ -102,6 +102,14 @@ public class HouseHelpController {
         );
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'AGENT')")
+    @PutMapping("/{id}/assign-agent/{agentId}")
+    public ResponseEntity<HouseHelp> assignToAgent(
+            @PathVariable Long id,
+            @PathVariable Long agentId) {
+        return ResponseEntity.ok(houseHelpService.assignToAgent(id, agentId));
+    }
+
     @PostMapping("/{id}/profile-picture")
     public ResponseEntity<?> uploadHouseHelpProfilePicture(
             @PathVariable Long id,
