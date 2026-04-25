@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -32,13 +33,20 @@ public class HomeOwnerPreferenceController {
     }
 
     /**
-     * Returns recommended househelps based on the home owner's preferences
+     * Returns recommended house helps for the home owner.
+     * <p>
+     * When {@code includeExcluded=true}, returns *every* evaluated candidate
+     * (passed and excluded) with per-candidate {@code reasons} explaining the
+     * score and why each filter accepted or rejected them — useful while
+     * tuning preferences and explaining empty result sets to homeowners.
      */
     @GetMapping("/househelps/recommendations")
     public ResponseEntity<List<HouseHelpMatchDTO>> recommendedHouseHelps(
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(name = "includeExcluded", defaultValue = "false") boolean includeExcluded
     ) {
-        List<HouseHelpMatchDTO> recommendations = discoverService.recommendations(userDetails.getUsername());
+        List<HouseHelpMatchDTO> recommendations =
+                discoverService.recommendations(userDetails.getUsername(), includeExcluded);
         return ResponseEntity.ok(recommendations);
     }
 }
