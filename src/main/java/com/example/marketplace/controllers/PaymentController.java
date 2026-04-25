@@ -56,10 +56,18 @@ public class PaymentController {
         }
     }
 
+    /**
+     * List payments. By default returns both archived and non-archived rows so
+     * the dashboard "All payments" tab is complete; pass ?includeArchived=false
+     * to exclude archived ones.
+     */
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("")
-    public ResponseEntity<Page<PaymentResponseDTO>> listPayments(Pageable pageable) {
-        return ResponseEntity.ok(paymentService.getAllPayments(pageable));
+    public ResponseEntity<Page<PaymentResponseDTO>> listPayments(
+            @RequestParam(name = "includeArchived", defaultValue = "true") boolean includeArchived,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(paymentService.getAllPayments(pageable, includeArchived));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

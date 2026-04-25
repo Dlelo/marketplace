@@ -131,8 +131,14 @@ public class PaymentService {
     }
 
     public Page<PaymentResponseDTO> getAllPayments(Pageable pageable) {
-        return paymentRepository.findAllByArchivedFalse(pageable)
-                .map(this::toDTO);
+        return getAllPayments(pageable, true);
+    }
+
+    public Page<PaymentResponseDTO> getAllPayments(Pageable pageable, boolean includeArchived) {
+        Page<Payment> page = includeArchived
+                ? paymentRepository.findAll(pageable)
+                : paymentRepository.findAllByArchivedFalse(pageable);
+        return page.map(this::toDTO);
     }
 
     public Page<PaymentResponseDTO> getArchivedPayments(Pageable pageable) {
