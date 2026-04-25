@@ -1,14 +1,29 @@
-# Use OpenJDK as the base image
-FROM eclipse-temurin:21-jdk-alpine
+# ─── build stage ────────────────────────────────────────────────────
+# Compile the Spring Boot fat-JAR inside Docker so the image is reproducible
+# and the host doesn't need a JDK / Gradle installed.
+FROM eclipse-temurin:21-jdk-alpine AS build
+WORKDIR /workspace
 
-# Set working directory
+# Cache the Gradle distribution + dependencies separately from the source.
+COPY gradlew settings.gradle build.gradle ./
+COPY gradle ./gradle
+RUN chmod +x ./gradlew && ./gradlew --no-daemon dependencies > /dev/null 2>&1 || true
+
+# Copy source and build the boot JAR (skip tests — run them in CI).
+COPY src ./src
+RUN ./gradlew --no-daemon -x test bootJar
+
+# ─── runtime stage ──────────────────────────────────────────────────
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Copy the built JAR file
-COPY build/libs/*.jar app.jar
+# Use a non-root user for the runtime.
+RUN addgroup -S app && adduser -S app -G app
 
-# Expose the application port
+# Copy only the boot JAR (skip the -plain.jar artifact).
+COPY --from=build /workspace/build/libs/*-SNAPSHOT.jar app.jar
+RUN chown app:app app.jar
+USER app
+
 EXPOSE 8080
-
-# Run the JAR file
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]

@@ -5,7 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +17,7 @@ import java.util.List;
 @Entity
 @Table(name = "house_help")
 @JsonInclude(JsonInclude.Include.ALWAYS)
+@EntityListeners(AuditingEntityListener.class)
 public class HouseHelp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -121,5 +126,13 @@ public class HouseHelp {
     @CollectionTable(name = "house_help_documents", joinColumns = @JoinColumn(name = "house_help_id"))
     @Column(name = "document_url")
     private List<String> additionalDocuments = new ArrayList<>();
+
+    @LastModifiedBy
+    @Column(name = "last_modified_by")
+    private Long lastModifiedBy;
+
+    @LastModifiedDate
+    @Column(name = "last_modified_at")
+    private Instant lastModifiedAt;
 
 }

@@ -1,48 +1,65 @@
-version: '3.8'
-
 services:
   app:
     build: .
+    image: yaya-marketplace:latest
     ports:
-      - "8080:8080"
+      - "${APP_PORT:-8080}:8080"
     depends_on:
-      db:
+      mysql_db:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/marketplace?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
+      # ── Datasource ──────────────────────────────────────────────
+      DB_HOST: mysql_db
+      DB_PORT: 3306
+      DB_NAME: ${MYSQL_DATABASE:-yaya}
+      DB_USERNAME: ${MYSQL_USER:-yaya}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-yaya}
 
+      # ── DigitalOcean Spaces ─────────────────────────────────────
       SPACES_ACCESS_KEY: ${SPACES_ACCESS_KEY:-}
       SPACES_SECRET_KEY: ${SPACES_SECRET_KEY:-}
-      DO_SPACES_ENDPOINT: https://fra1.digitaloceanspaces.com
-      DO_SPACES_BUCKET: yaya-docs
-      DO_SPACES_REGION: us-east-1
 
+      # ── M-Pesa (Daraja) ─────────────────────────────────────────
       DARAJA_CONSUMER_KEY: ${DARAJA_CONSUMER_KEY:-}
       DARAJA_SECRET_KEY: ${DARAJA_SECRET_KEY:-}
-      DARAJA_BUSINESS_SHORTCODE: 3131143
-      DARAJA_TRANSACTION_TYPE: CustomerBuyGoodsOnline
+      DARAJA_BUSINESS_SHORTCODE: ${DARAJA_BUSINESS_SHORTCODE:-174379}
+      DARAJA_TRANSACTION_TYPE: ${DARAJA_TRANSACTION_TYPE:-CustomerPayBillOnline}
       DARAJA_PASSKEY: ${DARAJA_PASSKEY:-}
-      DARAJA_CALLBACK_URL: https://yayaconnectapp.com/api/payments/webhook/mpesa
-      DARAJA_BASE_URL: https://api.safaricom.co.ke
+      DARAJA_CALLBACK_URL: ${DARAJA_CALLBACK_URL:-https://yayaconnectapp.com/api/payments/webhook/mpesa}
+      DARAJA_BASE_URL: ${DARAJA_BASE_URL:-https://sandbox.safaricom.co.ke}
 
+      # ── SendGrid (transactional email) ──────────────────────────
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY:-}
+      SENDGRID_FROM_EMAIL: ${SENDGRID_FROM_EMAIL:-no-reply@Hoyayaconnectapp.com}
+      SENDGRID_FROM_NAME: ${SENDGRID_FROM_NAME:-YayaConnect}
+
+      # ── Twilio Programmable SMS (OTP delivery) ──────────────────
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER:-}
+
+      # ── Frontend reference URL (used in outbound emails) ────────
+      FRONTEND_BASE_URL: ${FRONTEND_BASE_URL:-https://yayaconnectapp.com}
     restart: unless-stopped
 
-  db:
+  mysql_db:
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: marketplace
-      MYSQL_USER: marketplace_user
-      MYSQL_PASSWORD: marketplace_pass
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-yaya}
+      MYSQL_USER: ${MYSQL_USER:-yaya}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-yaya}
     ports:
-      - "3306:3306"
+      # Host port 3307 → container port 3306. Local-dev bootRun then talks to
+      # localhost:3307 (matching the historical setup) and Docker-internal
+      # connections still use mysql_db:3306.
+      - "${MYSQL_PORT:-3307}:3306"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-root}"]
       interval: 10s
-      retries: 5
+      timeout: 5s
+      retries: 10
     volumes:
       - mysql_data:/var/lib/mysql
 

@@ -13,6 +13,9 @@ public class UserResponseDTO {
     private HouseHelpResponseDTO houseHelp;
     private HomeOwnerUpdateDTO homeOwner;
     private AgentProfileDTO agentProfile;
+    /** ID of the user (typically an agent) who created this account. */
+    private Long createdById;
+    private String createdByName;
 
     @Data
     public static class AgentProfileDTO {

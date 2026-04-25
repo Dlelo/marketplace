@@ -140,6 +140,13 @@ public class PaymentService {
                 .map(this::toDTO);
     }
 
+    public List<PaymentResponseDTO> getPaymentsForUser(Long userId) {
+        return paymentRepository.findAllByUser_IdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
     public PaymentResponseDTO verifyPaymentManually(Long id) {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Payment not found: " + id));

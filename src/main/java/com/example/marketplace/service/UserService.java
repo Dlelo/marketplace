@@ -333,6 +333,11 @@ public class UserService {
         dto.setHouseHelp(mapToHouseHelpDTO(user.getHouseHelp()));
         dto.setHomeOwner(mapToHomeOwnerDTO(user.getHomeOwner()));
 
+        if (user.getCreatedBy() != null) {
+            dto.setCreatedById(user.getCreatedBy().getId());
+            dto.setCreatedByName(user.getCreatedBy().getName());
+        }
+
         // Include agent profile when the user has AGENT role
         agentRepository.findByUser(user).ifPresent(agent -> {
             UserResponseDTO.AgentProfileDTO profile = new UserResponseDTO.AgentProfileDTO();

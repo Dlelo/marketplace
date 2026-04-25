@@ -1,15 +1,21 @@
 package com.example.marketplace.controllers;
 
+import com.example.marketplace.dto.ChangePasswordRequest;
+import com.example.marketplace.dto.ForgotPasswordRequest;
 import com.example.marketplace.dto.LoginRequest;
 import com.example.marketplace.dto.RegisterRequest;
+import com.example.marketplace.dto.ResetPasswordRequest;
 import com.example.marketplace.dto.UserResponseDTO;
 import com.example.marketplace.model.User;
+import com.example.marketplace.repository.UserRepository;
 import com.example.marketplace.security.CustomUserDetails;
 import com.example.marketplace.security.JWTUtil;
+import com.example.marketplace.service.PasswordResetService;
 import com.example.marketplace.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,6 +36,8 @@ public class AuthController {
     private final UserService userService;
     private final JWTUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final PasswordResetService passwordResetService;
+    private final UserRepository userRepository;
 
     @PostMapping(value = {"/register", "/register/{role}"})
     public ResponseEntity<?> register(@RequestBody RegisterRequest dto, @PathVariable(required = false) String role) {
@@ -128,6 +136,58 @@ public class AuthController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred" + e.getMessage());
+        }
+    }
+
+    /**
+     * Initiate password reset. Always returns 200 with a generic message to
+     * avoid leaking which identifiers exist. The reset URL is logged on the
+     * server (and can be wired to email/SMS in PasswordResetService).
+     */
+    /**
+     * Generates a 6-digit OTP and delivers it via SMS (phone identifiers) or
+     * email. Always returns 200 with the same shape, but only includes a
+     * sessionToken when the identifier matched a real account — that prevents
+     * leaking which numbers/emails exist while still letting the client move
+     * to the OTP-entry step transparently.
+     */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        var result = passwordResetService.initiateReset(request.getIdentifier());
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "If an account matches, a reset code has been sent.");
+        if (result != null) {
+            body.put("sessionToken", result.sessionToken());
+            body.put("channel", result.channel());
+        }
+        return ResponseEntity.ok(body);
+    }
+
+    /** Verify the OTP and set the new password. */
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        try {
+            passwordResetService.completeReset(request.getToken(), request.getCode(), request.getNewPassword());
+            return ResponseEntity.ok(Map.of("message", "Password updated. You can now sign in."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    /** Authenticated change-password (user knows their current password). */
+    @PostMapping("/change-password")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> changePassword(
+            @RequestBody ChangePasswordRequest request,
+            Authentication auth
+    ) {
+        try {
+            User user = userRepository.findByEmail(auth.getName())
+                    .orElseThrow(() -> new IllegalArgumentException("User not found."));
+            passwordResetService.changePassword(user, request.getCurrentPassword(), request.getNewPassword());
+            return ResponseEntity.ok(Map.of("message", "Password changed successfully."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
         }
     }
 

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
@@ -22,6 +23,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Page<Payment> findAllByArchivedFalse(Pageable pageable);
 
     Page<Payment> findAllByArchivedTrue(Pageable pageable);
+
+    List<Payment> findAllByUser_IdOrderByCreatedAtDesc(Long userId);
 
     long countByStatus(PaymentStatus status);
 

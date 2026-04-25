@@ -2,6 +2,7 @@ package com.example.marketplace.controllers;
 
 import com.example.marketplace.dto.PaymentRequest;
 import com.example.marketplace.dto.PaymentResponseDTO;
+import com.example.marketplace.repository.UserRepository;
 import com.example.marketplace.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -9,8 +10,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,6 +22,7 @@ import java.util.Map;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final UserRepository userRepository;
 
     /**
      * Initiate M-Pesa payment
@@ -82,6 +86,31 @@ public class PaymentController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+    }
+
+    /**
+     * Returns the payment history for a user. Accessible to ADMIN/AGENT/SALES,
+     * or to the user themselves.
+     */
+    @GetMapping("/user/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN','AGENT','SALES','HOMEOWNER','HOUSEHELP')")
+    public ResponseEntity<?> getPaymentsForUser(@PathVariable Long userId, Authentication auth) {
+        boolean privileged = auth.getAuthorities().stream()
+                .anyMatch(a -> {
+                    String r = a.getAuthority();
+                    return r.equals("ROLE_ADMIN") || r.equals("ROLE_AGENT") || r.equals("ROLE_SALES");
+                });
+        if (!privileged) {
+            String email = auth.getName();
+            boolean isSelf = userRepository.findById(userId)
+                    .map(u -> email.equalsIgnoreCase(u.getEmail()))
+                    .orElse(false);
+            if (!isSelf) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        }
+        List<PaymentResponseDTO> payments = paymentService.getPaymentsForUser(userId);
+        return ResponseEntity.ok(payments);
     }
 
     @GetMapping("/status/{transactionId}")
