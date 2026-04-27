@@ -40,6 +40,9 @@ public class HouseHelpPreference {
 
     private Boolean okayWithPets;
 
+    /** House help is willing to wear a uniform on the job. */
+    private Boolean okayWithUniform;
+
     private Double minSalary;
     private Double maxSalary;
 }

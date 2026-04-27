@@ -22,6 +22,7 @@ public class HouseHelpPreferenceResponseDTO {
 
     private String preferredReligion;
     private Boolean okayWithPets;
+    private Boolean okayWithUniform;
 
     private Double minSalary;
     private Double maxSalary;

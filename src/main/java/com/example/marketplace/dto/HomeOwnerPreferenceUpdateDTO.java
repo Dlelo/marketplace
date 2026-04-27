@@ -25,6 +25,7 @@ public class HomeOwnerPreferenceUpdateDTO {
     private Boolean hasPets;
     private String religionPreference;
     private Boolean requiresSecurityCleared;
+    private Boolean requiresUniform;
 
     private Integer preferredMaxAge;
     private Integer preferredMinAge;

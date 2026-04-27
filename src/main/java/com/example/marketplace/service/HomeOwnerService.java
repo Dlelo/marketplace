@@ -117,6 +117,7 @@ public class HomeOwnerService {
         if (dto.getHasPets() != null) pref.setHasPets(dto.getHasPets());
         if (dto.getReligionPreference() != null) pref.setReligionPreference(dto.getReligionPreference());
         if (dto.getRequiresSecurityCleared() != null) pref.setRequiresSecurityCleared(dto.getRequiresSecurityCleared());
+        if (dto.getRequiresUniform() != null) pref.setRequiresUniform(dto.getRequiresUniform());
         if (dto.getPreferredMinAge() != null) pref.setPreferredMinAge(dto.getPreferredMinAge());
         if (dto.getPreferredMaxAge() != null) pref.setPreferredMaxAge(dto.getPreferredMaxAge());
         if (dto.getMinSalary() != null) pref.setMinSalary(dto.getMinSalary());

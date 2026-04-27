@@ -213,6 +213,13 @@ public class DiscoverService {
             ok = false;
         }
 
+        // Uniform — hard filter when the homeowner requires one
+        if (Boolean.TRUE.equals(pref.getRequiresUniform()) &&
+                (help.getPreferences() == null || !Boolean.TRUE.equals(help.getPreferences().getOkayWithUniform()))) {
+            reasons.add("Excluded: house help isn't willing to wear a uniform");
+            ok = false;
+        }
+
         // Child age ranges
         if (pref.getChildrenAgeRanges() != null && !pref.getChildrenAgeRanges().isEmpty() &&
                 help.getPreferences() != null && help.getPreferences().getPreferredChildAgeRanges() != null) {
@@ -414,6 +421,7 @@ public class DiscoverService {
                 pref.getHasPets(),
                 pref.getReligionPreference(),
                 pref.getRequiresSecurityCleared(),
+                pref.getRequiresUniform(),
                 pref.getPreferredMinAge(),
                 pref.getPreferredMaxAge(),
                 pref.getPreferredMinSalary(),

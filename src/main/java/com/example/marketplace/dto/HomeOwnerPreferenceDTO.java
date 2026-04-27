@@ -17,6 +17,7 @@ public record HomeOwnerPreferenceDTO(
         Boolean hasPets,
         String religionPreference,
         Boolean requiresSecurityCleared,
+        Boolean requiresUniform,
         Integer preferredMinAge,
         Integer preferredMaxAge,
         Double preferredMinSalary,

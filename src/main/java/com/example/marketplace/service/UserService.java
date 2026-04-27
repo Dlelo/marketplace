@@ -407,6 +407,7 @@ public class UserService {
             p.setPreferredServices(houseHelp.getPreferences().getPreferredServices());
             p.setPreferredReligion(houseHelp.getPreferences().getPreferredReligion());
             p.setOkayWithPets(houseHelp.getPreferences().getOkayWithPets());
+            p.setOkayWithUniform(houseHelp.getPreferences().getOkayWithUniform());
             p.setMinSalary(houseHelp.getPreferences().getMinSalary());
             p.setMaxSalary(houseHelp.getPreferences().getMaxSalary());
             dto.setPreferences(p);
@@ -445,6 +446,7 @@ public class UserService {
             pref.setHasPets(p.getHasPets());
             pref.setReligionPreference(p.getReligionPreference());
             pref.setRequiresSecurityCleared(p.getRequiresSecurityCleared());
+            pref.setRequiresUniform(p.getRequiresUniform());
             pref.setPreferredMinAge(p.getPreferredMinAge());
             pref.setPreferredMaxAge(p.getPreferredMaxAge());
             pref.setMinSalary(p.getMinSalary());

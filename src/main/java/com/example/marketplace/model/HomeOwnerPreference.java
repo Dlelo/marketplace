@@ -46,6 +46,9 @@ public class HomeOwnerPreference {
 
     private Boolean requiresSecurityCleared;
 
+    /** Homeowner expects the house help to wear a uniform on the job. */
+    private Boolean requiresUniform;
+
     private Integer preferredMaxAge;
     private Integer preferredMinAge;
 

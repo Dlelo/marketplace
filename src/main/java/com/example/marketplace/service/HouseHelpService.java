@@ -172,6 +172,7 @@ public class HouseHelpService {
 
         if (dto.getPreferredReligion() != null) p.setPreferredReligion(dto.getPreferredReligion());
         if (dto.getOkayWithPets() != null) p.setOkayWithPets(dto.getOkayWithPets());
+        if (dto.getOkayWithUniform() != null) p.setOkayWithUniform(dto.getOkayWithUniform());
 
         if (dto.getMinSalary() != null) p.setMinSalary(dto.getMinSalary());
         if (dto.getMaxSalary() != null) p.setMaxSalary(dto.getMaxSalary());
