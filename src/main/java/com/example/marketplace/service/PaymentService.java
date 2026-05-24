@@ -185,6 +185,10 @@ public class PaymentService {
         return dto;
     }
 
+    public Map<String, Object> queryPaymentStatus(String checkoutRequestId) {
+        return darajaService.querySTKPush(checkoutRequestId);
+    }
+
     public PaymentResponseDTO findByTransactionId(String transactionId){
         Payment payment = paymentRepository.findFirstByTransactionId(transactionId)
                 .orElseThrow(() -> new RuntimeException("Payment not found with transactionId: " + transactionId));

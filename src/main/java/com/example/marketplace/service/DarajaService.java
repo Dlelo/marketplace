@@ -90,6 +90,40 @@ public class DarajaService {
     }
 
     /**
+     * STK Push Query — checks the status of a previously initiated STK Push
+     */
+    public Map<String, Object> querySTKPush(String checkoutRequestId) {
+        String accessToken = generateAccessToken();
+        String url = baseUrl + "/mpesa/stkpushquery/v1/query";
+        String timestamp = generateTimestamp();
+        String password = generatePassword(timestamp);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, Object> request = new HashMap<>();
+        request.put("BusinessShortCode", businessShortCode);
+        request.put("Password", password);
+        request.put("Timestamp", timestamp);
+        request.put("CheckoutRequestID", checkoutRequestId);
+
+        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(request, headers);
+
+        try {
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Map.class);
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                log.info("STK Push Query result: {}", response.getBody());
+                return response.getBody();
+            }
+            throw new RuntimeException("STK Push Query returned empty response");
+        } catch (HttpClientErrorException e) {
+            log.error("STK Push Query error {}: {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("STK Push Query failed (" + e.getStatusCode() + "): " + e.getResponseBodyAsString());
+        }
+    }
+
+    /**
      * STK Push Request
      */
     public Map<String, Object> lipaNaMpesa(String phoneNumber, double amount, String accountReference, String transactionDesc) {

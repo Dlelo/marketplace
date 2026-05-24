@@ -129,4 +129,16 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
+    /**
+     * Poll Safaricom directly for the STK Push result (use when callback hasn't arrived yet).
+     */
+    @GetMapping("/query/{checkoutRequestId}")
+    public ResponseEntity<?> querySTKPushStatus(@PathVariable String checkoutRequestId) {
+        try {
+            return ResponseEntity.ok(paymentService.queryPaymentStatus(checkoutRequestId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
 }
