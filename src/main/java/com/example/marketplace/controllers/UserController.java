@@ -4,6 +4,8 @@ import com.example.marketplace.dto.*;
 import com.example.marketplace.model.HouseHelp;
 import com.example.marketplace.model.User;
 import com.example.marketplace.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController {
 
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
 
     public UserController(UserService userService) {
@@ -67,8 +70,9 @@ public class UserController {
                     request.getRoles()
             );
             return ResponseEntity.ok(updatedUser);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Throwable e) {
+            log.error("editUserRoles failed for userId={} roles={}", request.getUserId(), request.getRoles(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.toString());
         }
     }
 
