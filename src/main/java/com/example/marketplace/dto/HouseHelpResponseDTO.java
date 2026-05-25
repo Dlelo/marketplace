@@ -15,6 +15,8 @@ public class HouseHelpResponseDTO {
     private List<Languages> languages;
     private String levelOfEducation;
     private String contactPersons;
+    private String chiefName;
+    private String chiefPhoneNumber;
     private String homeLocation;
     private String exactHomeLocation;
     private CountyOptions homeCounty;

@@ -366,6 +366,8 @@ public class UserService {
         dto.setLanguages(houseHelp.getLanguages());
         dto.setLevelOfEducation(houseHelp.getLevelOfEducation());
         dto.setContactPersons(houseHelp.getContactPersons());
+        dto.setChiefName(houseHelp.getChiefName());
+        dto.setChiefPhoneNumber(houseHelp.getChiefPhoneNumber());
         dto.setHomeLocation(houseHelp.getHomeLocation());
         dto.setExactHomeLocation(houseHelp.getExactHomeLocation());
         dto.setHomeCounty(houseHelp.getHomeCounty());

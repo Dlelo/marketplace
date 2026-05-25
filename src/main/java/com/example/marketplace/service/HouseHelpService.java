@@ -42,6 +42,8 @@ public class HouseHelpService {
         if (dto.getContactPersons() != null) houseHelp.setContactPersons(dto.getContactPersons());
         if (dto.getHomeLocation() != null) houseHelp.setHomeLocation(dto.getHomeLocation());
         if (dto.getExactHomeLocation() != null) houseHelp.setExactHomeLocation(dto.getExactHomeLocation());
+        if (dto.getChiefName() != null) houseHelp.setChiefName(dto.getChiefName());
+        if (dto.getChiefPhoneNumber() != null) houseHelp.setChiefPhoneNumber(dto.getChiefPhoneNumber());
         if (dto.getHomeCounty() != null) houseHelp.setHomeCounty(dto.getHomeCounty());
         if (dto.getCurrentLocation() != null) houseHelp.setCurrentLocation(dto.getCurrentLocation());
         if (dto.getCurrentCounty() != null) houseHelp.setCurrentCounty(dto.getCurrentCounty());

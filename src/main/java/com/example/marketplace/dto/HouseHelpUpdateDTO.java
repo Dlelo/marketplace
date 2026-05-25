@@ -19,6 +19,8 @@ public class HouseHelpUpdateDTO {
     private String levelOfEducation;
     private String contactPersons;
     private String contactPersonsPhoneNumber;
+    private String chiefName;
+    private String chiefPhoneNumber;
     private String homeLocation;
     private String exactHomeLocation;
     private CountyOptions homeCounty;
