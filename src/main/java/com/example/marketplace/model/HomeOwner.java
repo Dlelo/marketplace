@@ -36,7 +36,7 @@ public class HomeOwner {
     private String nationalIdDocument;
     private String profilePictureDocument;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnoreProperties({"homeOwner"})
     @ToString.Exclude

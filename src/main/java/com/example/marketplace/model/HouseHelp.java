@@ -23,7 +23,7 @@ public class HouseHelp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonIgnoreProperties({"houseHelp", "homeOwner", "roles"})
     @ToString.Exclude
