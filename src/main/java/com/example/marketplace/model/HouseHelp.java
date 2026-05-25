@@ -17,6 +17,7 @@ import java.util.List;
 @Entity
 @Table(name = "house_help")
 @JsonInclude(JsonInclude.Include.ALWAYS)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @EntityListeners(AuditingEntityListener.class)
 public class HouseHelp {
     @Id
