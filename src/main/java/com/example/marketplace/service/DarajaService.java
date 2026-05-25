@@ -33,7 +33,10 @@ public class DarajaService {
     private String baseUrl;
 
     @Value("${daraja.businessShortCode}")
-    private String businessShortCode;
+    private String businessShortCode;  // Agent/head-office shortcode
+
+    @Value("${daraja.tillNumber}")
+    private String tillNumber;  // Store/Till number (PartyB for Buy Goods)
 
     @Value("${daraja.passkey}")
     private String passkey;
@@ -145,7 +148,7 @@ public class DarajaService {
         request.put("TransactionType", transactionType);
         request.put("Amount", (long) amount);
         request.put("PartyA", phoneNumber);
-        request.put("PartyB", businessShortCode);
+        request.put("PartyB", tillNumber);
         request.put("PhoneNumber", phoneNumber);
         request.put("CallBackURL", callbackUrl);
         request.put("AccountReference", accountReference);

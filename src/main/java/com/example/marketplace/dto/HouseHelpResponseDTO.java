@@ -16,6 +16,7 @@ public class HouseHelpResponseDTO {
     private String levelOfEducation;
     private String contactPersons;
     private String homeLocation;
+    private String exactHomeLocation;
     private CountyOptions homeCounty;
     private String currentLocation;
     private CountyOptions currentCounty;

@@ -47,13 +47,19 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnoreProperties({"user"})
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private HouseHelp houseHelp;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnoreProperties({"user"})
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private HomeOwner homeOwner;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private User createdBy;
 }

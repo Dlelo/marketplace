@@ -20,6 +20,7 @@ public class HouseHelpUpdateDTO {
     private String contactPersons;
     private String contactPersonsPhoneNumber;
     private String homeLocation;
+    private String exactHomeLocation;
     private CountyOptions homeCounty;
     private String currentLocation;
     private CountyOptions currentCounty;

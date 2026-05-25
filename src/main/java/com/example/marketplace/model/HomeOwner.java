@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -37,6 +39,8 @@ public class HomeOwner {
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnoreProperties({"homeOwner"})
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private User user;
 
     private boolean verified = false;

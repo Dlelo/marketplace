@@ -26,6 +26,8 @@ public class HouseHelp {
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonIgnoreProperties({"houseHelp", "homeOwner", "roles"})
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private User user;
 
     @Column(nullable = false)
@@ -40,6 +42,7 @@ public class HouseHelp {
     private String levelOfEducation;
     private String contactPersons;
     private String homeLocation;
+    private String exactHomeLocation;
 
     @Enumerated(EnumType.STRING)
     private CountyOptions homeCounty;
