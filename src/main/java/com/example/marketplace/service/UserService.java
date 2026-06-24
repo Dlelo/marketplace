@@ -48,6 +48,12 @@ public class UserService {
             email = null;
         }
 
+        // Normalize idNumber
+        String idNumber = dto.getIdNumber();
+        if (idNumber != null && idNumber.isBlank()) {
+            idNumber = null;
+        }
+
         // 2️⃣ Check phone duplicate
         if (userRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()) {
             throw new IllegalArgumentException("Phone number already exists");
@@ -58,7 +64,12 @@ public class UserService {
             throw new IllegalArgumentException("Email already exists");
         }
 
-        // 4️⃣ Resolve role
+        // 4️⃣ Check idNumber duplicate ONLY if provided
+        if (idNumber != null && userRepository.findByIdNumber(idNumber).isPresent()) {
+            throw new IllegalArgumentException("ID number already exists");
+        }
+
+        // 5️⃣ Resolve role
         String resolvedRoleName = (roleName == null || roleName.trim().isEmpty())
                 ? "HOMEOWNER"
                 : roleName.trim().toUpperCase();
@@ -68,10 +79,11 @@ public class UserService {
                         "Role " + resolvedRoleName + " does not exist. Please create it first."
                 ));
 
-        // 5️⃣ Create user
+        // 6️⃣ Create user
         User user = new User();
         user.setPhoneNumber(dto.getPhoneNumber());
-        user.setEmail(email); // ✅ now null or real value
+        user.setEmail(email);
+        user.setIdNumber(idNumber);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setName(dto.getName());
         user.setRoles(Set.of(role));
@@ -300,8 +312,12 @@ public class UserService {
     }
 
     public User findByEmailOrPhone(String identifier) {
+        String normalized = identifier != null ? identifier.trim().replaceAll("\\s+", "") : null;
         return userRepository.findByEmail(identifier)
                 .or(() -> userRepository.findByPhoneNumber(identifier))
+                .or(() -> userRepository.findByPhoneNumber(normalized))
+                .or(() -> userRepository.findByIdNumber(identifier))
+                .or(() -> userRepository.findByIdNumber(normalized))
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 

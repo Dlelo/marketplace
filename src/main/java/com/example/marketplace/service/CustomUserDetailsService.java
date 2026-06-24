@@ -33,9 +33,11 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .or(() -> userRepository.findByPhoneNumber(raw))
                 .or(() -> userRepository.findByEmail(normalized))
                 .or(() -> userRepository.findByPhoneNumber(normalized))
+                .or(() -> userRepository.findByIdNumber(raw))
+                .or(() -> userRepository.findByIdNumber(normalized))
                 .orElseThrow(() ->
                         new UsernameNotFoundException(
-                                "User not found with email or phone: " + identifier
+                                "User not found with identifier: " + identifier
                         )
                 );
 
@@ -60,7 +62,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     private String normalizeIdentifier(String identifier) {
         if (identifier == null) return null;
 
-        identifier = identifier.trim();
+        identifier = identifier.trim().replaceAll("\\s+", "");
 
         if (identifier.matches("^07\\d{8}$")) {
             return "+254" + identifier.substring(1);

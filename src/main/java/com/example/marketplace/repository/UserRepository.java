@@ -16,6 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
 
     Optional<User> findByEmail(String email);
     Optional<User> findByPhoneNumber(String phoneNumber);
+    Optional<User> findByIdNumber(String idNumber);
 
     Page<User> findDistinctByRoles_Name(String roleName, Pageable pageable);
 
