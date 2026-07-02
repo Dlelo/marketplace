@@ -38,6 +38,8 @@ public class HouseHelpFilterDTO {
     private Integer numberOfChildren;
 
     private HiringStatus hiringStatus;
+
+    private String skill;
 }
 
 

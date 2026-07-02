@@ -17,6 +17,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.security.core.Authentication;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,6 +110,35 @@ public class HouseHelpController {
             @PathVariable Long id,
             @PathVariable Long agentId) {
         return ResponseEntity.ok(houseHelpService.assignToAgent(id, agentId));
+    }
+
+    @GetMapping("/{id}/unlock-status")
+    @PreAuthorize("hasAnyRole('HOMEOWNER','ADMIN')")
+    public ResponseEntity<Map<String, Boolean>> getUnlockStatus(
+            @PathVariable Long id,
+            Authentication auth) {
+        return ResponseEntity.ok(houseHelpService.getUnlockStatus(id, auth.getName()));
+    }
+
+    @PostMapping("/{id}/unlock")
+    @PreAuthorize("hasAnyRole('HOMEOWNER','ADMIN')")
+    public ResponseEntity<?> unlockProfile(@PathVariable Long id, Authentication auth) {
+        houseHelpService.recordUnlock(id, auth.getName());
+        return ResponseEntity.ok(Map.of("unlocked", true));
+    }
+
+    @GetMapping("/{id}/full")
+    @PreAuthorize("hasAnyRole('HOMEOWNER','ADMIN')")
+    public ResponseEntity<?> getFullDetails(@PathVariable Long id, Authentication auth) {
+        try {
+            return ResponseEntity.ok(houseHelpService.getFullDetails(id, auth.getName()));
+        } catch (RuntimeException e) {
+            if ("LOCKED".equals(e.getMessage())) {
+                return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED)
+                        .body(Map.of("error", "Profile locked. Pay KSh 500 to unlock or subscribe to Homeowner Plus."));
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/{id}/profile-picture")

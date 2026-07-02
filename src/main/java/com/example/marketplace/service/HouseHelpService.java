@@ -1,12 +1,8 @@
 package com.example.marketplace.service;
 
 import com.example.marketplace.dto.*;
-import com.example.marketplace.model.Agent;
-import com.example.marketplace.model.GeoLocation;
-import com.example.marketplace.model.HouseHelp;
-import com.example.marketplace.model.HouseHelpPreference;
-import com.example.marketplace.repository.AgentRepository;
-import com.example.marketplace.repository.HouseHelpRepository;
+import com.example.marketplace.model.*;
+import com.example.marketplace.repository.*;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,10 +12,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
-
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -27,6 +25,9 @@ import java.util.List;
 public class HouseHelpService {
     private final HouseHelpRepository houseHelpRepository;
     private final AgentRepository agentRepository;
+    private final HouseHelpUnlockRepository unlockRepository;
+    private final UserRepository userRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     public Page<HouseHelp> getAllHouseHelps(Pageable pageable) {
         return houseHelpRepository.findAll(pageable);
@@ -111,6 +112,8 @@ public class HouseHelpService {
             dto.setHouseHelpType(hh.getHouseHelpType());
             dto.setSkills(hh.getSkills() == null ? null :
                     hh.getSkills().stream().map(Enum::name).collect(Collectors.toList()));
+            dto.setLanguages(hh.getLanguages() == null ? null :
+                    hh.getLanguages().stream().map(Enum::name).collect(Collectors.toList()));
             if (hh.getUser() != null) {
                 HouseHelpListDTO.UserSummary u = new HouseHelpListDTO.UserSummary();
                 u.setId(hh.getUser().getId());
@@ -146,6 +149,13 @@ public class HouseHelpService {
 
             if (filter.getHiringStatus() != null) {
                 predicates.add(cb.equal(root.get("hiringStatus"), filter.getHiringStatus()));
+            }
+
+            if (filter.getSkill() != null && !filter.getSkill().isEmpty()) {
+                predicates.add(cb.isMember(
+                        com.example.marketplace.enums.Skills.valueOf(filter.getSkill().toUpperCase()),
+                        root.get("skills")
+                ));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
@@ -260,6 +270,79 @@ public class HouseHelpService {
         }
         houseHelp.setAgency(agent.getAgency());
         return houseHelpRepository.save(houseHelp);
+    }
+
+    public Map<String, Boolean> getUnlockStatus(Long houseHelpId, String principalIdentifier) {
+        User user = findUserByIdentifier(principalIdentifier);
+        boolean unlocked = unlockRepository.existsByUser_IdAndHouseHelp_Id(user.getId(), houseHelpId);
+        boolean hasSubscription = subscriptionRepository.hasActiveSubscription(principalIdentifier);
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("unlocked", unlocked || hasSubscription);
+        result.put("hasSubscription", hasSubscription);
+        return result;
+    }
+
+    @Transactional
+    public void recordUnlock(Long houseHelpId, String principalIdentifier) {
+        User user = findUserByIdentifier(principalIdentifier);
+        HouseHelp houseHelp = houseHelpRepository.findById(houseHelpId)
+                .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
+
+        if (!unlockRepository.existsByUser_IdAndHouseHelp_Id(user.getId(), houseHelpId)) {
+            HouseHelpUnlock unlock = HouseHelpUnlock.builder()
+                    .user(user)
+                    .houseHelp(houseHelp)
+                    .unlockedAt(LocalDateTime.now())
+                    .build();
+            unlockRepository.save(unlock);
+        }
+    }
+
+    public Map<String, Object> getFullDetails(Long houseHelpId, String principalIdentifier) {
+        User user = findUserByIdentifier(principalIdentifier);
+        boolean hasSubscription = subscriptionRepository.hasActiveSubscription(principalIdentifier);
+        boolean unlocked = unlockRepository.existsByUser_IdAndHouseHelp_Id(user.getId(), houseHelpId);
+
+        if (!hasSubscription && !unlocked) {
+            throw new RuntimeException("LOCKED");
+        }
+
+        HouseHelp hh = houseHelpRepository.findById(houseHelpId)
+                .orElseThrow(() -> new RuntimeException("HouseHelp not found"));
+
+        Map<String, Object> details = new HashMap<>();
+        if (hh.getUser() != null) {
+            details.put("name", hh.getUser().getName());
+            details.put("phoneNumber", hh.getUser().getPhoneNumber());
+        }
+        details.put("currentLocation", hh.getCurrentLocation());
+        details.put("homeLocation", hh.getHomeLocation());
+        details.put("yearsOfExperience", hh.getYearsOfExperience());
+        details.put("age", hh.getAge());
+        details.put("gender", hh.getGender());
+        details.put("languages", hh.getLanguages() == null ? List.of() :
+                hh.getLanguages().stream().map(Enum::name).collect(Collectors.toList()));
+        details.put("skills", hh.getSkills() == null ? List.of() :
+                hh.getSkills().stream().map(Enum::name).collect(Collectors.toList()));
+        details.put("houseHelpType", hh.getHouseHelpType());
+        details.put("profilePictureDocument", hh.getProfilePictureDocument());
+        details.put("experienceSummary", hh.getExperienceSummary());
+        details.put("levelOfEducation", hh.getLevelOfEducation());
+        details.put("religion", hh.getReligion());
+        details.put("availability", hh.getAvailability());
+        // Verification badges — no raw ID numbers exposed (Kenya Data Protection Act)
+        details.put("identityVerified", hh.getNationalId() != null && !hh.getNationalId().isBlank());
+        details.put("goodConductVerified", hh.getGoodConduct() != null && !hh.getGoodConduct().isBlank());
+        details.put("medicalReportVerified", hh.getMedicalReport() != null && !hh.getMedicalReport().isBlank());
+        details.put("securityCleared", hh.isSecurityCleared());
+        details.put("verified", hh.isVerified());
+        return details;
+    }
+
+    private User findUserByIdentifier(String identifier) {
+        return userRepository.findByEmail(identifier)
+                .or(() -> userRepository.findByPhoneNumber(identifier))
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
 }

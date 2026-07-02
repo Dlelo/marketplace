@@ -16,6 +16,7 @@ public class HouseHelpListDTO {
     private Integer yearsOfExperience;
     private AvailabilityType houseHelpType;
     private List<String> skills;
+    private List<String> languages;
     private UserSummary user;
 
     @Data
